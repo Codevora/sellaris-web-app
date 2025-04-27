@@ -1,8 +1,8 @@
 "use client";
 import {useSearchParams} from "next/navigation";
-import {useEffect} from "react";
+import {Suspense, useEffect} from "react";
 
-export default function PaymentStatus() {
+function PaymentStatusContent() {
  const params = useSearchParams();
  const status = params.get("status");
  const orderId = params.get("order_id");
@@ -16,4 +16,12 @@ export default function PaymentStatus() {
  }, [status, orderId]);
 
  return <div>Processing payment status...</div>;
+}
+
+export default function PaymentStatus() {
+return (
+ <Suspense fallback={<div>Loading...</div>}>
+  <PaymentStatusContent />
+ </Suspense>
+)
 }
