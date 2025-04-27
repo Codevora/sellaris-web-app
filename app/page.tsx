@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Sellaris - Teman terbaik untuk bisnis anda",
+  description: "Sellaris Web App"
+}
 
 export default function Home() {
   return (
