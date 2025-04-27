@@ -10,19 +10,23 @@ export interface SubscriptionPackage {
     created_at?: Date;
     updated_at?: Date;
 }
-
+// types/subscription.ts
 export interface UserSubscription {
-    id?: string;
+    id: string;
     userId: string;
     packageId: string;
     packageName: string;
-    startDate: Date;
-    endDate: Date;
     price: number;
     duration: number;
-    status: "active" | "expired" | "canceled";
-    paymentStatus: "pending" | "paid" | "failed";
-    paymentMethod?: "bank-transfer" | "credit-card" | "e-wallet";
-    createdAt?: Date;
-    updatedAt?: Date;
+    startDate: Date;
+    endDate: Date;
+    status: 'active' | 'expired' | 'canceled';
+    paymentStatus: 'pending' | 'paid' | 'failed';
+    paymentMethod: 'bank-transfer' | 'credit-card' | 'e-wallet'; // Tambahkan ini
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+// Buat tipe untuk membuat subscription baru
+export type CreateUserSubscription = Omit<UserSubscription,
+    'id' | 'status' | 'paymentStatus' | 'createdAt' | 'updatedAt'>;

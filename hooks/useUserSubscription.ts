@@ -32,6 +32,7 @@ export const useUserSubscription = (userId?: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+
     const fetchSubscriptions = async (id: string) => {
         try {
             setLoading(true);
@@ -130,39 +131,59 @@ export const useUserSubscription = (userId?: string) => {
     };
 
 
-    const createSubscription = async (
-        subscriptionData: Omit<
-            UserSubscription,
-            "id" | "status" | "paymentStatus" | "createdAt" | "updatedAt"
-        >
-    ) => {
+    const createSubscription = async (data: UserSubscription) => {
         try {
-            setLoading(true);
-            const docRef = await addDoc(collection(db, "userSubscriptions"), {
-                ...subscriptionData,
-                status: "active",
-                paymentStatus: "pending",
-                createdAt: new Date(),
-                updatedAt: new Date(),
+            // 1. Simpan data subscription ke database
+            const subscriptionResponse = await fetch('/api/subscriptions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...data,
+                    paymentStatus: 'pending', // Status awal
+                    status: 'active' // Status subscription
+                }),
             });
 
-            const newSubscription: UserSubscription = {
-                ...subscriptionData,
-                id: docRef.id,
-                status: "active",
-                paymentStatus: "pending",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
+            const subscriptionResult = await subscriptionResponse.json();
 
-            setSubscriptions([...subscriptions, newSubscription]);
-            return { success: true, id: docRef.id };
-        } catch (err) {
-            setError("Failed to create subscription");
-            console.error("Error creating subscription:", err);
-            return { success: false };
-        } finally {
-            setLoading(false);
+            if (!subscriptionResponse.ok) {
+                throw new Error(subscriptionResult.message || 'Failed to create subscription');
+            }
+
+            // 2. Jika metode pembayaran e-wallet (DANA), buat transaksi pembayaran
+            if (data.paymentMethod === 'e-wallet') {
+                const paymentResponse = await fetch('/api/payment/dana/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subscriptionId: subscriptionResult.id,
+                        amount: data.price,
+                        userId: data.userId
+                    }),
+                });
+
+                const paymentResult = await paymentResponse.json();
+
+                if (!paymentResponse.ok) {
+                    throw new Error(paymentResult.message || 'Failed to create DANA payment');
+                }
+
+                // Gabungkan hasil
+                return {
+                    ...subscriptionResult,
+                    paymentData: paymentResult
+                };
+            }
+
+            return subscriptionResult;
+
+        } catch (error) {
+            console.error('Error in createSubscription:', error);
+            throw error;
         }
     };
 

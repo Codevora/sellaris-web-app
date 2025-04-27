@@ -1,4 +1,3 @@
-// /app/packages/checkout/page.tsx
 "use client";
 
 import {useRouter, useSearchParams} from "next/navigation";
@@ -7,53 +6,58 @@ import {useSubscriptionPackages} from "@/hooks/useSubscriptionPackages";
 import {useUserSubscription} from "@/hooks/useUserSubscription";
 import {useState} from "react";
 
-export default function CheckoutForm() {
- const router = useRouter();
- const searchParams = useSearchParams();
- const packageId = searchParams.get("packageId");
- const {data: session}: {data: any} = useSession();
- const {packages, loading: packagesLoading} = useSubscriptionPackages();
- const {createSubscription, loading: subscriptionLoading} =
-  useUserSubscription();
- const [paymentMethod, setPaymentMethod] = useState<string>("bank-transfer");
+export default function CheckoutPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const packageId = searchParams.get("packageId");
+  const {data: session}: {data: any} = useSession();
+  const {packages, loading: packagesLoading} = useSubscriptionPackages();
+  const {createSubscription, loading: subscriptionLoading} =
+   useUserSubscription();
+  const [paymentMethod, setPaymentMethod] = useState<
+   "bank-transfer" | "credit-card" | "e-wallet"
+  >("bank-transfer");
 
- const selectedPackage = packages.find((pkg) => pkg.id === packageId);
+  const selectedPackage = packages.find((pkg) => pkg.id === packageId);
 
-const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- if (!session?.user?.id || !selectedPackage) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+   e.preventDefault();
+   if (!session?.user?.id || !selectedPackage) return;
 
- try {
-  const subscriptionData = {
-   userId: session.user.id,
-   packageId: selectedPackage.id!,
-   packageName: selectedPackage.name,
-   price: selectedPackage.price,
-   duration: selectedPackage.duration,
-   startDate: new Date(),
-   endDate: new Date(
-    new Date().setMonth(new Date().getMonth() + selectedPackage.duration)
-   ),
-   paymentMethod: paymentMethod, // Tambahkan ini
+   const subscriptionData: CreateUserSubscription = {
+    userId: session.user.id,
+    packageId: selectedPackage.id!,
+    packageName: selectedPackage.name,
+    price: selectedPackage.price,
+    duration: selectedPackage.duration,
+    startDate: new Date(),
+    endDate: new Date(
+     new Date().setMonth(new Date().getMonth() + selectedPackage.duration)
+    ),
+    paymentMethod: paymentMethod, // Sekarang sesuai dengan tipe
+   };
+
+   try {
+    const result = await createSubscription(subscriptionData);
+
+    if (result?.success) {
+     if (paymentMethod === "e-wallet") {
+      router.push(
+       `/payment/dana?subscriptionId=${result.id}&amount=${selectedPackage.price}`
+      );
+     } else {
+      router.push(`/payment/confirm?subscriptionId=${result.id}`);
+     }
+    }
+   } catch (error) {
+    console.error("Checkout failed:", error);
+   }
   };
 
-  const result = await createSubscription(subscriptionData);
+  if (packagesLoading) return <div>Loading package details...</div>;
+  if (!selectedPackage) return <div>Package not found</div>;
 
-  if (result.success) {
-   if (paymentMethod === "e-wallet") {
-    router.push(`/payment/dana/process?subscriptionId=${result.id}`);
-   } else {
-    router.push(`/payment/confirm?subscriptionId=${result.id}`);
-   }
-  }
- } catch (error) {
-  console.error("Checkout failed:", error);
- }
-};
-
- if (packagesLoading) return <div>Loading package details...</div>;
- if (!selectedPackage) return <div>Package not found</div>;
-
+  
  return (
   <div className="max-w-4xl mx-auto py-8 px-4">
    <h1 className="text-2xl font-bold mb-6">Checkout</h1>
