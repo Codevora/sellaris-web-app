@@ -27,7 +27,7 @@ const Navbar = () => {
  useEffect(() => {
   setIsClient(true);
   const handleScroll = () => {
-   setScrolled(window.scrollY > 10);
+   setScrolled(window.scrollY > 20);
   };
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
@@ -61,10 +61,10 @@ const Navbar = () => {
    initial={{y: -100}}
    animate={{y: 0}}
    transition={{type: "spring", stiffness: 100}}
-   className={`fixed w-full z-50 ${
-    scrolled ? "bg-black/90 backdrop-blur-lg" : "bg-primary"
+   className={`fixed w-full z-50 transition-all duration-500 ${
+    scrolled ? "bg-primary backdrop-blur-lg py-5" : "bg-primary py-7"
    }`}>
-   <div className="container mx-auto px-6 py-5">
+   <div className="container mx-auto px-6">
     <div className="flex justify-between items-center">
      {/* Logo with floating effect */}
      <motion.div className="relative">

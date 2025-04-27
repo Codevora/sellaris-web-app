@@ -55,7 +55,7 @@ export default function PricingPage() {
    router.push("/auth/login?callbackUrl=/packages");
    return;
   }
-  router.push(`/products/checkout?packageId=${packageId}`);
+  router.push(`/pricing/checkout?packageId=${packageId}`);
  };
 
  if (loading) {
