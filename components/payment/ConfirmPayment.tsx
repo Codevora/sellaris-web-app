@@ -11,7 +11,7 @@ const QRCode = dynamic(() => import("react-qr-code"), {
  ssr: false,
 });
 
-export default function PaymentConfirmPage() {
+export default function ConfirmPayment() {
  const router = useRouter();
  const searchParams = useSearchParams();
  const subscriptionId = searchParams.get("subscriptionId");
