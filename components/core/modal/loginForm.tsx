@@ -22,11 +22,7 @@ const itemVariants = {
  visible: {opacity: 1, y: 0},
 };
 
-export default function LoginForm({
- searchParams,
-}: {
- searchParams?: {callbackUrl: string};
-}) {
+export default function LoginForm({searchParams}: {searchParams?: {callbackUrl: string}}) {
  const {push} = useRouter();
  const [error, setError] = useState("");
  const [isLoading, setIsLoading] = useState(false);
@@ -39,11 +35,13 @@ export default function LoginForm({
   setIsLoading(true);
 
   const formData = new FormData(e.currentTarget as HTMLFormElement);
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
   try {
    const res = await signIn("credentials", {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email,
+    password,
     redirect: false,
     callbackUrl,
    });
@@ -53,8 +51,9 @@ export default function LoginForm({
    } else {
     setError("Invalid Email or Password");
    }
-  } catch (error) {
+  } catch (err) {
    setError("An unexpected error occurred");
+   console.error(err);
   } finally {
    setIsLoading(false);
   }

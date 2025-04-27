@@ -21,8 +21,8 @@ const floatingVariants = {
 const Navbar = () => {
  const [scrolled, setScrolled] = useState(false);
  const [mobileOpen, setMobileOpen] = useState(false);
- const [hoveredItem, setHoveredItem] = useState<number | null>(null);
  const [isClient, setIsClient] = useState(false);
+ const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
  useEffect(() => {
   setIsClient(true);
@@ -67,8 +67,7 @@ const Navbar = () => {
    <div className="container mx-auto px-6 py-5">
     <div className="flex justify-between items-center">
      {/* Logo with floating effect */}
-     <motion.div
-      className="relative">
+     <motion.div className="relative">
       <Link href="/">
        <motion.span
         className="text-3xl font-bold italic text-white"

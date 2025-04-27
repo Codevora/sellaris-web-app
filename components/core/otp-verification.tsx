@@ -43,9 +43,7 @@ export default function OTPVerification({email}: {email: string}) {
  };
 
  useEffect(() => {
-  if (inputRefs.current[activeInput]) {
-   inputRefs.current[activeInput]?.focus();
-  }
+  inputRefs.current[activeInput]?.focus();
  }, [activeInput]);
 
  const handleSubmit = async () => {
@@ -78,7 +76,8 @@ export default function OTPVerification({email}: {email: string}) {
    }
 
    router.push("/member/dashboard");
-  } catch (error: any) {
+  } catch (err) {
+   const error = err as Error;
    setError(error.message);
   } finally {
    setIsLoading(false);

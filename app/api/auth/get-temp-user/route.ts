@@ -24,7 +24,8 @@ export async function POST(request: Request) {
    status: true,
    password: userData.password,
   });
- } catch (error) {
+ } catch (error: unknown) {
+  console.error(error);
   return NextResponse.json(
    {status: false, message: "Failed to retrieve user data"},
    {status: 500}

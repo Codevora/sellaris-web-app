@@ -7,7 +7,6 @@ import {
  getDocs,
  getFirestore,
  query,
- setDoc,
  updateDoc,
  where,
 } from "firebase/firestore";
@@ -19,18 +18,15 @@ const firestore = getFirestore(app);
 
 export async function retrieveData(collectionName: string) {
  const snapshot = await getDocs(collection(firestore, collectionName));
- const data = snapshot.docs.map((doc) => ({
+ return snapshot.docs.map((doc) => ({
   id: doc.id,
   ...doc.data(),
  }));
-
- return data;
 }
 
 export async function retrieveDataById(collectionName: string, id: string) {
  const snapshot = await getDoc(doc(firestore, collectionName, id));
- const data = snapshot.data();
- return data;
+ return snapshot.data();
 }
 
 export async function register(data: {
@@ -68,6 +64,7 @@ export async function register(data: {
  const otp = Math.floor(100000 + Math.random() * 900000).toString();
  data.otp = otp;
  data.otp_expiry = new Date(Date.now() + 15 * 60 * 1000);
+
  try {
   const userRef = await addDoc(collection(firestore, "temp_users"), data);
   await sendVerificationEmail(data.email, otp, data.fullname);
@@ -78,6 +75,7 @@ export async function register(data: {
    tempUserId: userRef.id,
   };
  } catch (error) {
+  console.error("Registration error:", error);
   return {
    status: false,
    statusCode: 400,
@@ -109,7 +107,8 @@ export async function verifyOTP(email: string, otp: string) {
    return {status: false, message: "OTP expired"};
   }
 
-  const {otp: _, otp_expiry: __, ...userDataWithoutOtp} = userData;
+  // Destructure with unused variables prefixed with _
+  const {otp: _otp, otp_expiry: _otpExpiry, ...userDataWithoutOtp} = userData;
   userDataWithoutOtp.verified = true;
 
   const newUserRef = await addDoc(
@@ -133,14 +132,8 @@ export async function verifyOTP(email: string, otp: string) {
   return {status: false, message: "Verification failed"};
  }
 }
-export async function login({email}: {email: string}): Promise<{
- id: string;
- email: string;
- fullname: string;
- role: string;
- password: string;
- verified: boolean;
-} | null> {
+
+export async function login({email}: {email: string}) {
  const q = query(collection(firestore, "users"), where("email", "==", email));
  const snapshot = await getDocs(q);
 
@@ -157,4 +150,69 @@ export async function login({email}: {email: string}): Promise<{
   password: data.password,
   verified: data.verified,
  };
+}
+
+export async function addAppProduct(data: {
+ name: string;
+ description: string;
+ duration: number; // in months
+ pricePercentage: number; // percentage of sales
+ features: string[];
+ isActive: boolean;
+ created_at?: Date;
+ updated_at?: Date;
+}) {
+ try {
+  data.created_at = new Date();
+  data.updated_at = new Date();
+  const docRef = await addDoc(collection(firestore, "appProducts"), data);
+  return {
+   status: true,
+   statusCode: 200,
+   message: "Package added successfully",
+   id: docRef.id,
+  };
+ } catch (error) {
+  return {status: false, statusCode: 500, message: "Failed to add package"};
+ }
+}
+
+export async function retrieveAppProducts() {
+ const snapshot = await getDocs(collection(firestore, "appProducts"));
+ const data = snapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+ }));
+ return data;
+}
+
+export async function retrieveAppProductById(id: string) {
+ const snapshot = await getDoc(doc(firestore, "appProducts", id));
+ const data = snapshot.data();
+ return data;
+}
+
+export async function updateAppProduct(
+ id: string,
+ data: Partial<{
+  name: string;
+  description: string;
+  duration: number;
+  pricePercentage: number;
+  features: string[];
+  isActive: boolean;
+  updated_at?: Date;
+ }>
+) {
+ try {
+  data.updated_at = new Date();
+  await updateDoc(doc(firestore, "appProducts", id), data);
+  return {
+   status: true,
+   statusCode: 200,
+   message: "Package updated successfully",
+  };
+ } catch (error) {
+  return {status: false, statusCode: 500, message: "Failed to update package"};
+ }
 }

@@ -2,11 +2,15 @@ import {login} from "@/lib/firebase/service";
 import {signIn} from "next-auth/react";
 import {NextResponse} from "next/server";
 
+interface ErrorResponse {
+ message: string;
+ status?: number;
+}
+
 export async function POST(request: Request) {
  const {email, callbackUrl} = await request.json();
 
  try {
-  // Dapatkan user data dari Firestore
   const user = await login({email});
 
   if (!user) {
@@ -16,7 +20,6 @@ export async function POST(request: Request) {
    );
   }
 
-  // Lakukan sign in dengan NextAuth
   await signIn("credentials", {
    email,
    callbackUrl: callbackUrl || "/",
@@ -27,10 +30,11 @@ export async function POST(request: Request) {
    status: true,
    message: "Login successful",
   });
- } catch (error: any) {
+ } catch (error) {
+  const err = error as ErrorResponse;
   return NextResponse.json(
-   {status: false, message: error.message},
-   {status: 500}
+   {status: false, message: err.message || "Internal server error"},
+   {status: err.status || 500}
   );
  }
 }
