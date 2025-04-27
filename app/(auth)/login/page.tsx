@@ -1,10 +1,17 @@
 "use client";
 import LoginForm from "@/components/core/modal/loginForm";
 import {useSearchParams} from "next/navigation";
+import { Suspense } from "react";
+
+function LoginContent() {
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
+    return <LoginForm searchParams={{callbackUrl}} />
+}
 
 export default function LoginPage() {
- const params = useSearchParams();
- const callbackUrl = params.get("callbackUrl") || "/dashboard";
-
- return <LoginForm searchParams={{callbackUrl}} />;
+ <Suspense fallback={<div>Loading...</div>}>
+  <LoginContent />
+ </Suspense>
 }
