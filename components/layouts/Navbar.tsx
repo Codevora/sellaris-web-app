@@ -22,7 +22,7 @@ const Navbar = () => {
  const [scrolled, setScrolled] = useState(false);
  const [mobileOpen, setMobileOpen] = useState(false);
  const [isClient, setIsClient] = useState(false);
- const [hoveredItem, setHoveredItem] = useState<number | null>(null);
+ const [_hoveredItem, setHoveredItem] = useState<number | null>(null);
 
  useEffect(() => {
   setIsClient(true);

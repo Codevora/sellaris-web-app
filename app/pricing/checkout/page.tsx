@@ -19,30 +19,37 @@ export default function CheckoutPage() {
 
  const selectedPackage = packages.find((pkg) => pkg.id === packageId);
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!session?.user?.id || !selectedPackage) return;
+const handleSubmit = async (e: React.FormEvent) => {
+ e.preventDefault();
+ if (!session?.user?.id || !selectedPackage) return;
 
-  try {
-   const result = await createSubscription({
-    userId: session.user.id,
-    packageId: selectedPackage.id!,
-    packageName: selectedPackage.name,
-    price: selectedPackage.price,
-    duration: selectedPackage.duration,
-    startDate: new Date(),
-    endDate: new Date(
-     new Date().setMonth(new Date().getMonth() + selectedPackage.duration)
-    ),
-   });
+ try {
+  const subscriptionData = {
+   userId: session.user.id,
+   packageId: selectedPackage.id!,
+   packageName: selectedPackage.name,
+   price: selectedPackage.price,
+   duration: selectedPackage.duration,
+   startDate: new Date(),
+   endDate: new Date(
+    new Date().setMonth(new Date().getMonth() + selectedPackage.duration)
+   ),
+   paymentMethod: paymentMethod, // Tambahkan ini
+  };
 
-   if (result.success) {
+  const result = await createSubscription(subscriptionData);
+
+  if (result.success) {
+   if (paymentMethod === "e-wallet") {
+    router.push(`/payment/dana/process?subscriptionId=${result.id}`);
+   } else {
     router.push(`/payment/confirm?subscriptionId=${result.id}`);
    }
-  } catch (error) {
-   console.error("Checkout failed:", error);
   }
- };
+ } catch (error) {
+  console.error("Checkout failed:", error);
+ }
+};
 
  if (packagesLoading) return <div>Loading package details...</div>;
  if (!selectedPackage) return <div>Package not found</div>;

@@ -9,7 +9,7 @@ export default function PricingPage() {
  const {packages, loading} = useSubscriptionPackages();
  const {data: session} = useSession();
  const router = useRouter();
- const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+ const [selectedPackage, _setSelectedPackage] = useState<string | null>(null);
 
  const packageStyles = {
   silver: {
@@ -52,7 +52,7 @@ export default function PricingPage() {
 
  const handleSelectPackage = (packageId: string) => {
   if (!session) {
-   router.push("/auth/login?callbackUrl=/packages");
+   router.push("/login?callbackUrl=/pricing/checkout?packageId=" + packageId);
    return;
   }
   router.push(`/pricing/checkout?packageId=${packageId}`);

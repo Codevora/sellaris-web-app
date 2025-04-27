@@ -75,7 +75,7 @@ export default function OTPVerification({email}: {email: string}) {
     throw new Error(signInResponse.error);
    }
 
-   router.push("/member/dashboard");
+   router.push("/dashboard");
   } catch (err) {
    const error = err as Error;
    setError(error.message);
@@ -127,7 +127,7 @@ export default function OTPVerification({email}: {email: string}) {
    </button>
 
    <div className="text-center mt-4 text-sm text-gray-600">
-    Didn't receive code?{" "}
+    Didn&apos;t receive code?{" "}
     <button className="text-blue-600 hover:underline">Resend</button>
    </div>
   </motion.div>
