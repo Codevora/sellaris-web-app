@@ -76,7 +76,7 @@ export default function ConfirmPayment() {
       setPaymentStatus("success");
       clearInterval(pollInterval);
       setTimeout(() => {
-       router.push("/thank-you");
+       router.push("/finish");
       }, 3000);
      }
     } catch (error) {
