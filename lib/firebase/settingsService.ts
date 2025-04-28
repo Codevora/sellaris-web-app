@@ -36,10 +36,30 @@ export const SettingsService = {
   try {
    const docRef = doc(db, "settings", userId);
    const docSnap = await getDoc(docRef);
-   return docSnap.exists() ? (docSnap.data() as SettingsData) : null;
+
+   if (!docSnap.exists()) {
+    // Buat dokumen default jika tidak ada
+    const defaultSettings: SettingsData = {
+     userId,
+     profile: {name: ""},
+     system: {
+      currency: "USD",
+      timezone: "UTC",
+      businessHours: {start: "09:00", end: "17:00"},
+     },
+     appearance: {
+      theme: "system", // Pastikan nilai sesuai dengan tipe yang didefinisikan
+      accentColor: "blue",
+     },
+    };
+    await setDoc(docRef, defaultSettings);
+    return defaultSettings;
+   }
+
+   return docSnap.data() as SettingsData;
   } catch (error) {
    console.error("Error getting settings:", error);
-   throw new Error("Failed to load settings");
+   return null;
   }
  },
 

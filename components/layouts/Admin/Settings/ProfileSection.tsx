@@ -14,13 +14,10 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 const schema = yup.object().shape({
  name: yup.string().required("Name is required"),
  email: yup.string().email("Invalid email").required("Email is required"),
- currentPassword: yup
-  .string()
-  .when("newPassword", (newPassword: string, schema) => {
-   return newPassword
-    ? schema.required("Current password is required")
-    : schema;
-  }),
+ currentPassword: yup.string().when("newPassword", {
+  is: (newPassword: string) => !!newPassword,
+  then: (schema) => schema.required("Current password is required"),
+ }),
  newPassword: yup
   .string()
   .min(8, "Password must be at least 8 characters")

@@ -17,7 +17,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function SettingsClientPage() {
- const {data: session} = useSession();
+ const {data: session}: {data: any} = useSession();
  const {t} = useTranslation();
  const [activeTab, setActiveTab] = useState("profile");
  const [settings, setSettings] = useState<SettingsData | null>(null);
@@ -53,10 +53,18 @@ export default function SettingsClientPage() {
     await SettingsService.updateSettings(session.user.id, {
      [section]: data,
     });
-    setSettings((prev) => ({
-     ...prev,
-     [section]: data,
-    }));
+    setSettings((prev) => {
+     if (!prev) {
+      return {
+       userId: session.user.id,
+       [section]: data,
+      } as SettingsData;
+     }
+     return {
+      ...prev,
+      [section]: data,
+     };
+    });
     setSuccess(t("settings.saveSuccess") || "Settings saved successfully");
     return true;
    }
