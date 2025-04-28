@@ -1,10 +1,27 @@
+"use client";
+import {useState} from "react";
 import AdminSidebar from "@/components/layouts/AdminSidebar";
 
-export default function Layout({children}: {children: React.ReactNode}) {
+export default function DashboardLayout({
+ children,
+}: {
+ children: React.ReactNode;
+}) {
+ const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
  return (
-  <div className="flex h-screen ">
-   <AdminSidebar />
-   <main className="ml-64 p-5 bg-white w-full">{children}</main>
+  <div className="flex min-h-screen">
+   <AdminSidebar
+    isCollapsed={isSidebarCollapsed}
+    setIsCollapsed={setIsSidebarCollapsed}
+   />
+
+   <main
+    className={`flex-1 transition-all duration-300 ease-in-out ${
+     isSidebarCollapsed ? "ml-20" : "ml-64"
+    }`}>
+    {children}
+   </main>
   </div>
  );
 }
