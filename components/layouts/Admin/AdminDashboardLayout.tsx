@@ -18,7 +18,7 @@ export default function ClientDashboardLayout({
 
    <main
     className={`flex-1 transition-all duration-300 ease-in-out ${
-     isSidebarCollapsed ? "ml-20" : "ml-64"
+     isSidebarCollapsed ? "ml-20" : "ml-[300px]"
     } p-6`}>
     {children}
    </main>

@@ -37,7 +37,7 @@ const links = [
 
 const sidebarVariants = {
  open: {
-  width: 250,
+  width: 300,
   opacity: 1,
   transition: {type: "spring", stiffness: 300, damping: 30},
  },
@@ -66,7 +66,7 @@ export default function AdminSidebar({
 
  return (
   <motion.div
-   className="fixed left-0 top-0 h-full bg-gradient-to-b from-primary/10 to-secondary/10 backdrop-blur-sm p-5 flex flex-col justify-between items-center rounded-r-[16px] shadow-lg border-r border-primary/20 overflow-visible"
+   className="fixed left-0 top-0 h-full  bg-gradient-to-b from-primary/10 to-secondary/10 backdrop-blur-sm p-5 flex flex-col justify-between items-center rounded-r-[16px] shadow-lg border-r border-primary/20 overflow-visible"
    initial={false}
    animate={isCollapsed ? "closed" : "open"}
    variants={sidebarVariants}>

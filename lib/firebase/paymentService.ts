@@ -1,30 +1,30 @@
-import {
- collection,
- addDoc,
- getDocs,
- doc,
- updateDoc,
- deleteDoc,
- query,
- where,
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where 
 } from "firebase/firestore";
-import {db} from "./init";
+import { db } from "./init";
 
 export type PaymentMethod = {
- id?: string;
- name: string;
- type: "ewallet" | "bank" | "credit_card" | "cash";
- ewalletType?: "gopay" | "ovo" | "dana" | "shopeepay" | "linkaja";
- bankName?: string;
- accountNumber?: string;
- accountName?: string;
- cardNumber?: string;
- cardHolder?: string;
- expiryDate?: string;
- cvv?: string;
- isActive: boolean;
- createdAt?: Date;
- updatedAt?: Date;
+  id?: string;
+  name: string;
+  type: 'ewallet' | 'bank' | 'credit_card' | 'cash';
+  ewalletType?: 'gopay' | 'ovo' | 'dana' | 'shopeepay' | 'linkaja';
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  cardNumber?: string;
+  cardHolder?: string;
+  expiryDate?: string;
+  cvv?: string;
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export const PaymentService = {
@@ -32,6 +32,8 @@ export const PaymentService = {
   data: Omit<PaymentMethod, "id" | "createdAt" | "updatedAt">
  ) {
   try {
+   // Validate required fields
+   if (!data.name) throw new Error("Name is required");
    if (data.type === "ewallet" && !data.ewalletType) {
     throw new Error("E-wallet type is required");
    }

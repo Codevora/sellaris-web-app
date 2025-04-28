@@ -1,51 +1,79 @@
 "use client";
 
 import {useState, useEffect} from "react";
-import {PaymentService} from "@/lib/firebase/paymentService";
+import {
+ PaymentService,
+ type PaymentMethod,
+} from "@/lib/firebase/paymentService";
 import AddPaymentModal from "./AddPaymentModal";
+import DeleteConfirmationModal from "./PaymentMethod/DeleteConfirmationModal";
+import EditPaymentModal from "./PaymentMethod/EditPaymentModal";
 import {toast} from "react-toastify";
 import {FiPlus, FiEdit, FiTrash2} from "react-icons/fi";
 
 export default function PaymentMethodsPage() {
- const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
- const [isModalOpen, setIsModalOpen] = useState(false);
- const [isLoading, setIsLoading] = useState(true);
+const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const [currentPayment, setCurrentPayment] = useState<PaymentMethod | null>(
+ null
+);
+const [isLoading, setIsLoading] = useState(true);
 
- const fetchPaymentMethods = async () => {
-  try {
-   setIsLoading(true);
-   const data = await PaymentService.getPaymentMethods();
-   setPaymentMethods(data);
-  } catch (error) {
-   toast.error("Failed to fetch payment methods");
-   console.error(error);
-  } finally {
-   setIsLoading(false);
-  }
- };
-
- useEffect(() => {
-  fetchPaymentMethods();
- }, []);
-
- const handleDelete = async (id: string) => {
-  if (confirm("Are you sure you want to delete this payment method?")) {
-   const result = await PaymentService.deletePaymentMethod(id);
-   if (result.success) {
-    toast.success("Payment method deleted");
-    fetchPaymentMethods();
-   } else {
-    toast.error("Failed to delete payment method");
+  const fetchPaymentMethods = async () => {
+   try {
+    setIsLoading(true);
+    const data = await PaymentService.getPaymentMethods();
+    setPaymentMethods(data);
+   } catch (error) {
+    toast.error("Failed to fetch payment methods");
+    console.error(error);
+   } finally {
+    setIsLoading(false);
    }
-  }
- };
+  };
+
+  useEffect(() => {
+   fetchPaymentMethods();
+  }, []);
+
+  const handleEditClick = (payment: PaymentMethod) => {
+   setCurrentPayment(payment);
+   setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (payment: PaymentMethod) => {
+   setCurrentPayment(payment);
+   setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+   if (!currentPayment?.id) return;
+
+   try {
+    const result = await PaymentService.deletePaymentMethod(currentPayment.id);
+    if (result.success) {
+     toast.success("Payment method deleted");
+     fetchPaymentMethods();
+    } else {
+     toast.error("Failed to delete payment method");
+    }
+   } catch (error) {
+    toast.error("An error occurred");
+    console.error(error);
+   } finally {
+    setIsDeleteModalOpen(false);
+    setCurrentPayment(null);
+   }
+  };
 
  return (
   <div className="p-6">
    <div className="flex justify-between items-center mb-6">
     <h1 className="text-2xl font-bold">Payment Methods</h1>
     <button
-     onClick={() => setIsModalOpen(true)}
+     onClick={() => setIsAddModalOpen(true)}
      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
      <FiPlus /> Add Payment Method
     </button>
@@ -115,11 +143,13 @@ export default function PaymentMethodsPage() {
           </span>
          </td>
          <td className="px-6 py-4 whitespace-nowrap">
-          <button className="text-blue-500 hover:text-blue-700 mr-3">
+          <button
+           onClick={() => handleEditClick(method)}
+           className="text-blue-500 hover:text-blue-700 mr-3">
            <FiEdit />
           </button>
           <button
-           onClick={() => handleDelete(method.id)}
+           onClick={() => handleDeleteClick(method)}
            className="text-red-500 hover:text-red-700">
            <FiTrash2 />
           </button>
@@ -132,10 +162,34 @@ export default function PaymentMethodsPage() {
    )}
 
    <AddPaymentModal
-    isOpen={isModalOpen}
-    onClose={() => setIsModalOpen(false)}
+    isOpen={isAddModalOpen}
+    onClose={() => setIsAddModalOpen(false)}
     refreshData={fetchPaymentMethods}
    />
+
+   {currentPayment && (
+    <>
+     <EditPaymentModal
+      isOpen={isEditModalOpen}
+      onClose={() => {
+       setIsEditModalOpen(false);
+       setCurrentPayment(null);
+      }}
+      payment={currentPayment}
+      refreshData={fetchPaymentMethods}
+     />
+
+     <DeleteConfirmationModal
+      isOpen={isDeleteModalOpen}
+      onClose={() => {
+       setIsDeleteModalOpen(false);
+       setCurrentPayment(null);
+      }}
+      onConfirm={handleDeleteConfirm}
+      itemName={currentPayment.name}
+     />
+    </>
+   )}
   </div>
  );
 }

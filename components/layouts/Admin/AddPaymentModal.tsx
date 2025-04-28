@@ -1,15 +1,18 @@
 "use client";
 
 import {useState} from "react";
-import {PaymentService} from "@/lib/firebase/paymentService";
+import {
+ PaymentService,
+ type PaymentMethod,
+} from "@/lib/firebase/paymentService";
 import {toast} from "react-toastify";
 import {FiX, FiCreditCard, FiDollarSign, FiSmartphone} from "react-icons/fi";
-import {RiBankCardFill} from "react-icons/ri";
+import { RiBankCard2Fill } from "react-icons/ri";
 import {motion, AnimatePresence} from "framer-motion";
 
 const paymentTypes = [
  {value: "ewallet", label: "E-Wallet", icon: <FiSmartphone />},
- {value: "bank", label: "Bank", icon: <RiBankCardFill />},
+ {value: "bank", label: "Bank", icon: <RiBankCard2Fill />},
  {value: "credit_card", label: "Credit Card", icon: <FiCreditCard />},
  {value: "cash", label: "Cash", icon: <FiDollarSign />},
 ];
@@ -22,6 +25,10 @@ const ewalletTypes = [
  {value: "linkaja", label: "LinkAja"},
 ];
 
+type FormData = Omit<PaymentMethod, "id" | "createdAt" | "updatedAt"> & {
+ ewalletType: "gopay" | "ovo" | "dana" | "shopeepay" | "linkaja";
+};
+
 export default function AddPaymentModal({
  isOpen,
  onClose,
@@ -31,7 +38,7 @@ export default function AddPaymentModal({
  onClose: () => void;
  refreshData: () => void;
 }) {
- const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState<FormData>({
   name: "",
   type: "ewallet",
   ewalletType: "gopay",
@@ -44,6 +51,7 @@ export default function AddPaymentModal({
   cvv: "",
   isActive: true,
  });
+
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [step, setStep] = useState(1);
 
@@ -52,9 +60,10 @@ export default function AddPaymentModal({
   setIsSubmitting(true);
 
   try {
-   const result = await PaymentService.addPaymentMethod({
+   const paymentData: Omit<PaymentMethod, "id" | "createdAt" | "updatedAt"> = {
     name: formData.name,
-    type: formData.type as any,
+    type: formData.type,
+    isActive: formData.isActive,
     ...(formData.type === "ewallet" && {
      ewalletType: formData.ewalletType,
      accountNumber: formData.accountNumber,
@@ -70,11 +79,12 @@ export default function AddPaymentModal({
      expiryDate: formData.expiryDate,
      cvv: formData.cvv,
     }),
-    isActive: formData.isActive,
-   });
+   };
+
+   const result = await PaymentService.addPaymentMethod(paymentData);
 
    if (result.success) {
-    toast.success("Payment method added!");
+    toast.success("Payment method added successfully!");
     refreshData();
     onClose();
    } else {
@@ -161,7 +171,10 @@ export default function AddPaymentModal({
          <select
           value={formData.ewalletType}
           onChange={(e) =>
-           setFormData({...formData, ewalletType: e.target.value as any})
+           setFormData({
+            ...formData,
+            ewalletType: e.target.value as typeof formData.ewalletType,
+           })
           }
           className="w-full p-2 border rounded"
           required>
