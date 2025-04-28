@@ -1,27 +1,29 @@
-"use client";
-import {useState} from "react";
-import AdminSidebar from "@/components/layouts/AdminSidebar";
+import type {Metadata} from "next";
+import ClientDashboardLayout from "@/components/layouts/Admin/AdminDashboardLayout";
+import { routeMetadata } from "@/types/route-types";
+
+export async function generateMetadata({
+ params,
+}: {
+ params: {slug: string};
+}): Promise<Metadata> {
+ const pathname = params.slug
+  ? `/admin/dashboard/${params.slug}`
+  : "/admin/dashboard";
+ const metadata = routeMetadata[pathname] || routeMetadata["/admin/dashboard"];
+
+ return {
+  ...metadata,
+  icons: {
+   icon: "/favicon-admin.ico",
+  },
+ };
+}
 
 export default function DashboardLayout({
  children,
 }: {
  children: React.ReactNode;
 }) {
- const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
- return (
-  <div className="flex min-h-screen">
-   <AdminSidebar
-    isCollapsed={isSidebarCollapsed}
-    setIsCollapsed={setIsSidebarCollapsed}
-   />
-
-   <main
-    className={`flex-1 transition-all duration-300 ease-in-out ${
-     isSidebarCollapsed ? "ml-20" : "ml-64"
-    }`}>
-    {children}
-   </main>
-  </div>
- );
+ return <ClientDashboardLayout>{children}</ClientDashboardLayout>;
 }

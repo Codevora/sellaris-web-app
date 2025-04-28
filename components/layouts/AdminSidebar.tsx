@@ -3,12 +3,12 @@ import {signOut} from "next-auth/react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {motion, AnimatePresence} from "framer-motion";
-import {useState} from "react";
 import {FaUser, FaSignOutAlt} from "react-icons/fa";
-import {FaPercent, FaCartShopping, FaChevronRight} from "react-icons/fa6";
+import {FaCartShopping, FaChevronRight} from "react-icons/fa6";
 import {GoGear} from "react-icons/go";
 import {MdDashboard} from "react-icons/md";
 import {IoIosArrowDropleft, IoIosArrowDropright} from "react-icons/io";
+import {RiBankCardFill} from "react-icons/ri";
 
 interface AdminSidebarProps {
  isCollapsed: boolean;
@@ -18,8 +18,8 @@ interface AdminSidebarProps {
 const links = [
  {name: "Dashboard", path: "/admin/dashboard", icon: <MdDashboard />},
  {
-  name: "Products",
-  path: "/admin/dashboard/products",
+  name: "Packages",
+  path: "/admin/dashboard/packages",
   icon: <FaCartShopping />,
  },
  {
@@ -27,7 +27,11 @@ const links = [
   path: "/admin/dashboard/user-management",
   icon: <FaUser />,
  },
- {name: "Taxes", path: "/admin/dashboard/taxes", icon: <FaPercent />},
+ {
+  name: "Payment Methods",
+  path: "/admin/dashboard/payment-methods",
+  icon: <RiBankCardFill />,
+ },
  {name: "Settings", path: "/admin/dashboard/settings", icon: <GoGear />},
 ];
 
@@ -54,7 +58,10 @@ const textVariants = {
  closed: {opacity: 0},
 };
 
-export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSidebarProps) {
+export default function AdminSidebar({
+ isCollapsed,
+ setIsCollapsed,
+}: AdminSidebarProps) {
  const pathname = usePathname();
 
  return (
@@ -66,10 +73,10 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }: AdminSideb
    <div className="flex flex-col w-full items-center overflow-visible">
     <Link href="/">
      <motion.h1
-      className="text-4xl text-primary mb-10"
-      style={{fontFamily: "Agency FB"}}
+      className="text-3xl text-primary mb-10 font-bold italic"
+      style={{fontFamily: "Raleway"}}
       animate={isCollapsed ? {scale: 0.8} : {scale: 1}}>
-      {isCollapsed ? "" : "9/1/1"}
+      {isCollapsed ? "..." : "SELLARIS"}
      </motion.h1>
     </Link>
 
