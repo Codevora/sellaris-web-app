@@ -1,7 +1,16 @@
-// app/providers.tsx
 "use client";
-import {SessionProvider} from "next-auth/react";
 
-export function Providers({children}: {children: React.ReactNode}) {
- return <SessionProvider>{children}</SessionProvider>;
+import {ThemeProvider as NextThemesProvider} from "next-themes";
+import {ReactNode} from "react";
+
+export function Providers({children}: {children: ReactNode}) {
+ return (
+  <NextThemesProvider
+   attribute="class"
+   defaultTheme="system"
+   enableSystem
+   disableTransitionOnChange>
+   {children}
+  </NextThemesProvider>
+ );
 }

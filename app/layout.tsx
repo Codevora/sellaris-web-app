@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layouts/Navbar";
 import {usePathname} from "next/navigation";
 import {SessionProvider} from "next-auth/react";
+import {ThemeProvider} from "next-themes"; // Tambahkan ini
 
 const geistSans = Geist({
  variable: "--font-geist-sans",
@@ -27,14 +28,24 @@ export default function RootLayout({
  );
 
  return (
-  <html lang="en">
+  <html
+   lang="en"
+   suppressHydrationWarning>
+   {" "}
+   {/* Tambahkan suppressHydrationWarning */}
    <SessionProvider>
     <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-     {showNavbar && <Navbar />}
-     <main>{children}</main>
+     <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem>
+      {" "}
+      {/* Tambahkan ThemeProvider */}
+      {showNavbar && <Navbar />}
+      <main>{children}</main>
+     </ThemeProvider>
     </body>
    </SessionProvider>
   </html>
  );
 }
-  
