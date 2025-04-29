@@ -28,3 +28,11 @@ body {
 @theme {
   --color-primary: #357266;
 }
+
+@media (max-width: 768px) {
+  .dashboard-flyout {
+    top: 80px !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+}

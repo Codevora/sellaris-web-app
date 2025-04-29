@@ -5,27 +5,11 @@ import {useState, useEffect} from "react";
 import {FiMenu, FiX} from "react-icons/fi";
 import SessionButton from "@/components/ui/Session";
 
-const floatingVariants = {
- initial: {y: -20, opacity: 0},
- animate: {
-  y: 0,
-  opacity: 1,
-  transition: {
-   type: "spring",
-   stiffness: 100,
-   damping: 10,
-  },
- },
-};
-
 const Navbar = () => {
  const [scrolled, setScrolled] = useState(false);
  const [mobileOpen, setMobileOpen] = useState(false);
- const [isClient, setIsClient] = useState(false);
- const [_hoveredItem, setHoveredItem] = useState<number | null>(null);
 
  useEffect(() => {
-  setIsClient(true);
   const handleScroll = () => {
    setScrolled(window.scrollY > 20);
   };
@@ -40,111 +24,87 @@ const Navbar = () => {
   {name: "About", path: "/about"},
  ];
 
- if (!isClient) {
-  return (
-   <header className="fixed w-full z-50 bg-primary backdrop-blur-lg">
-    <div className="container mx-auto px-6 py-4">
-     <div className="flex justify-between items-center">
-      <span
-       className="text-3xl font-bold text-white italic"
-       style={{fontFamily: "'Raleway', sans-serif"}}>
-       SELLARIS
-      </span>
-     </div>
-    </div>
-   </header>
-  );
- }
-
  return (
   <motion.header
    initial={{y: -100}}
    animate={{y: 0}}
    transition={{type: "spring", stiffness: 100}}
-   className={`fixed w-full z-50 transition-all duration-500 ${
-    scrolled ? "bg-primary backdrop-blur-lg py-5" : "bg-primary py-7"
+   className={`fixed w-full z-50 transition-all duration-300 ${
+    scrolled ? "bg-primary/95 backdrop-blur-md py-3" : "bg-primary/90 py-4"
    }`}>
-   <div className="container mx-auto px-6">
+   <div className="container mx-auto px-4">
     <div className="flex justify-between items-center">
-     {/* Logo with floating effect */}
-     <motion.div className="relative">
-      <Link href="/">
-       <motion.span
-        className="text-3xl font-bold italic text-white"
-        style={{fontFamily: "'Raleway', sans-serif"}}
-        initial="initial"
-        animate="animate"
-        variants={floatingVariants}>
-        SELLARIS
-       </motion.span>
-      </Link>
-      <motion.div
-       className="absolute -bottom-1 left-0 h-[3px] bg-white"
-       initial={{width: 0}}
-       animate={{width: "100%"}}
-       transition={{duration: 1, delay: 0.5}}
-      />
-     </motion.div>
+     {/* Logo */}
+     <Link
+      href="/"
+      className="z-50">
+      <motion.span
+       className="text-3xl font-bold italic text-white"
+       style={{fontFamily: "'Raleway', sans-serif"}}
+       whileHover={{scale: 1.05}}>
+       SELLARIS
+      </motion.span>
+     </Link>
 
      {/* Desktop Navigation */}
-     <nav className="hidden md:flex space-x-8 items-center">
-      {navItems.map((item, index) => (
-       <motion.div
-        key={index}
-        className="relative"
-        onHoverStart={() => setHoveredItem(index)}
-        onHoverEnd={() => setHoveredItem(null)}>
-        <Link
-         href={item.path}
-         className="text-white/90 hover:text-white text-lg font-medium px-3 py-2"
-         style={{fontFamily: "'Raleway', sans-serif"}}>
-         {item.name}
-        </Link>
-       </motion.div>
+     <nav className="hidden md:flex items-center space-x-6">
+      {navItems.map((item) => (
+       <Link
+        key={item.path}
+        href={item.path}
+        className="text-white/90 hover:text-white text-lg font-medium px-3 py-2 transition-colors relative group">
+        {item.name}
+        <span className="absolute bottom-0 left-1/2 h-0.5 bg-white transform -translate-x-1/2 w-0 group-hover:w-3/4 transition-all duration-300" />
+       </Link>
       ))}
+      <div className="ml-4">
+       <SessionButton />
+      </div>
      </nav>
 
-     {/* Session Button */}
-     <div className="hidden md:block">
-      <SessionButton />
-     </div>
-
      {/* Mobile Menu Button */}
-     <motion.button
-      className="md:hidden text-white p-2"
-      whileTap={{scale: 0.9}}
-      onClick={() => setMobileOpen(!mobileOpen)}>
-      {mobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-     </motion.button>
+     <button
+      className="md:hidden text-white p-2 z-50"
+      onClick={() => setMobileOpen(!mobileOpen)}
+      aria-label="Toggle menu">
+      {mobileOpen ? (
+       <FiX
+        size={28}
+        className="text-white"
+       />
+      ) : (
+       <FiMenu
+        size={28}
+        className="text-white"
+       />
+      )}
+     </button>
     </div>
 
     {/* Mobile Menu */}
     <AnimatePresence>
      {mobileOpen && (
       <motion.div
-       initial={{opacity: 0, height: 0}}
-       animate={{opacity: 1, height: "auto"}}
-       exit={{opacity: 0, height: 0}}
+       initial={{opacity: 0, y: -20}}
+       animate={{opacity: 1, y: 0}}
+       exit={{opacity: 0, y: -20}}
        transition={{duration: 0.3}}
-       className="md:hidden overflow-hidden">
-       <div className="pt-4 pb-8 space-y-6">
-        {navItems.map((item, index) => (
-         <motion.div
-          key={index}
-          initial={{x: -50, opacity: 0}}
-          animate={{x: 0, opacity: 1}}
-          transition={{delay: index * 0.1}}>
-          <Link
-           href={item.path}
-           className="block text-white/90 hover:text-white text-xl px-4 py-3"
-           style={{fontFamily: "'Raleway', sans-serif"}}
-           onClick={() => setMobileOpen(false)}>
-           {item.name}
-          </Link>
-         </motion.div>
+       className="md:hidden fixed inset-0 bg-primary/95 backdrop-blur-lg pt-20 px-6 z-40">
+       <div className="flex flex-col space-y-6">
+        {navItems.map((item) => (
+         <Link
+          key={item.path}
+          href={item.path}
+          className="text-white text-2xl font-medium py-3 border-b border-white/10"
+          onClick={() => setMobileOpen(false)}>
+          {item.name}
+         </Link>
         ))}
-        <div className="px-4 pt-4">
-         <SessionButton />
+        <div className="pt-4">
+         <SessionButton
+          mobile
+          onClose={() => setMobileOpen(false)}
+         />
         </div>
        </div>
       </motion.div>

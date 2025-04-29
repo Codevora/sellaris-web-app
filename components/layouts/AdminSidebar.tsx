@@ -23,8 +23,8 @@ const links = [
   icon: <FaCartShopping />,
  },
  {
-  name: "User Management",
-  path: "/admin/dashboard/user-management",
+  name: "Client Management",
+  path: "/admin/dashboard/client-management",
   icon: <FaUser />,
  },
  {
