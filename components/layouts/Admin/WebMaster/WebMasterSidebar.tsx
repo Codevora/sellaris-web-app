@@ -18,7 +18,6 @@ import {IoIosArrowDropright} from "react-icons/io";
 import {MdDashboard} from "react-icons/md";
 import {useState} from "react";
 
-
 const webmasterLinks = [
  {name: "Dashboard", path: "/admin/webmaster", icon: <MdDashboard />},
  {
@@ -110,8 +109,10 @@ export default function WebMasterSidebar() {
     {/* Header and menu items */}
     <div className="flex-1 overflow-y-auto">
      <Link href="/admin/webmaster">
-      <h1 className="text-2xl font-bold mb-8 text-white text-center">
-       WEBMASTER
+      <h1
+       className="text-3xl font-bold mb-8 italic text-white text-center"
+       style={{fontFamily: "'Raleway', sans-serif"}}>
+       SELLARIS
       </h1>
      </Link>
 

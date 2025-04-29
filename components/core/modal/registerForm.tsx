@@ -76,7 +76,7 @@ export default function RegisterForm() {
 
  return (
   <motion.div
-   className="bg-white/90 backdrop-blur-lg w-full max-w-md rounded-2xl shadow-xl overflow-hidden"
+   className="bg-white/90 w-full max-w-md overflow-hidden"
    initial="hidden"
    animate="visible"
    variants={containerVariants}>

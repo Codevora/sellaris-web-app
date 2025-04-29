@@ -4,7 +4,6 @@ import {useState, useEffect} from "react";
 import {motion} from "framer-motion";
 import {FiX, FiCheck} from "react-icons/fi";
 import {HexColorPicker} from "react-colorful";
-import {addPackage, updatePackage} from "@/lib/firebase/packageService";
 import {Package} from "@/types/package";
 
 interface PackageFormProps {
