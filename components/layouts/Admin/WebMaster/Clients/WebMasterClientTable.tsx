@@ -4,17 +4,15 @@ import {useState, useEffect} from "react";
 import {motion} from "framer-motion";
 import {FiEdit2, FiSearch, FiTrash2, FiUser} from "react-icons/fi";
 import {Client} from "@/types/client";
-import EditClientModal from "./EditClientModal";
+import WebMasterClientEdit from "./WebMasterClientEdit";
 
-
-export default function ClientTable() {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function WebMasterClientTable() {
+ const [searchTerm, setSearchTerm] = useState("");
  const [clients, setClients] = useState<Client[]>([]);
  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
- // Fetch clients from API
  useEffect(() => {
   const fetchClients = async () => {
    try {
@@ -29,7 +27,6 @@ export default function ClientTable() {
   fetchClients();
  }, []);
 
- // Filter clients based on search term
  useEffect(() => {
   if (searchTerm.trim() === "") {
    setFilteredClients(clients);
@@ -43,7 +40,6 @@ export default function ClientTable() {
   }
  }, [searchTerm, clients]);
 
- // Delete client
  const handleDelete = async (id: string) => {
   if (confirm("Are you sure you want to delete this client?")) {
    try {
@@ -60,13 +56,11 @@ export default function ClientTable() {
   }
  };
 
- // Edit client
  const handleEdit = (client: Client) => {
   setSelectedClient(client);
   setIsEditModalOpen(true);
  };
 
- // Update client after edit
  const handleUpdate = async (updatedClient: Client) => {
   try {
    const res = await fetch(`/api/clients/${updatedClient.id}`, {
@@ -90,7 +84,6 @@ export default function ClientTable() {
   }
  };
 
- // Animation variants
  const rowVariants = {
   hidden: {opacity: 0, x: -10},
   visible: (i: number) => ({
@@ -104,7 +97,7 @@ export default function ClientTable() {
 
  return (
   <div>
-   <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+   <div className="bg-white mb-8">
     <div className="flex justify-between items-center mb-6">
      <div className="relative w-64">
       <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -201,7 +194,7 @@ export default function ClientTable() {
    </div>
 
    {selectedClient && (
-    <EditClientModal
+    <WebMasterClientEdit
      isOpen={isEditModalOpen}
      onClose={() => setIsEditModalOpen(false)}
      client={selectedClient}

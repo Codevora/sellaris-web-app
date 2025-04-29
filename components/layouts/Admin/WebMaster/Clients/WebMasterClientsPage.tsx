@@ -1,11 +1,10 @@
 "use client";
 import {motion} from "framer-motion";
-import {FiUsers, FiSearch} from "react-icons/fi";
-import ClientTable from "@/components/layouts/Admin/Client/ClientTable";
-import ClientStats from "@/components/layouts/Admin/Client/ClientStats";
-import {useState} from "react";
+import {FiUsers} from "react-icons/fi";
+import WebMasterClientTable from ".//WebMasterClientTable";
+import WebMasterClientStats from "./WebMasterClientStats";
 
-export default function ClientManagementPage() {
+export default function WebMasterClientsPage() {
  const containerVariants = {
   hidden: {opacity: 0},
   visible: {
@@ -44,10 +43,9 @@ export default function ClientManagementPage() {
    <motion.div
     variants={itemVariants}
     className="mb-8">
-    <ClientStats />
-    <ClientTable />
+    <WebMasterClientStats />
+    <WebMasterClientTable />
    </motion.div>
-
   </motion.div>
  );
 }

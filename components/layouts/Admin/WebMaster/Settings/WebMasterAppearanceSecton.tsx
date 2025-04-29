@@ -7,7 +7,6 @@ import {SettingsService} from "@/lib/firebase/settingsService";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-
 const themes = [
  {
   id: "light",
@@ -34,7 +33,7 @@ const colors = [
  {id: "orange", name: "Orange", class: "bg-orange-500"},
 ];
 
-interface AppearanceSectionProps {
+interface WebMasterAppearanceSectionProps {
  settings?: {
   theme?: "light" | "dark" | "system";
   accentColor?: string;
@@ -42,10 +41,10 @@ interface AppearanceSectionProps {
  onSave: (section: string, data: any) => Promise<boolean>;
 }
 
-export default function AppearanceSection({
+export default function WebMasterAppearanceSection({
  settings,
  onSave,
-}: AppearanceSectionProps) {
+}: WebMasterAppearanceSectionProps) {
  const {theme, setTheme} = useTheme();
  const {t} = useTranslation();
  const [selectedTheme, setSelectedTheme] = useState(theme || "system");

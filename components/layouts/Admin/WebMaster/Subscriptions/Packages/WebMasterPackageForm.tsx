@@ -14,20 +14,20 @@ interface PackageFormProps {
 }
 
 const DEFAULT_COLOR_SCHEME = {
- primary: "#3b82f6", 
- secondary: "#bfdbfe", 
- text: "#1e3a8a", 
+ primary: "#3b82f6",
+ secondary: "#bfdbfe",
+ text: "#1e3a8a",
 };
 
-const PackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
+const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
  const [formData, setFormData] = useState<Omit<Package, "id">>({
   name: "",
   description: "",
   price: 0,
-  duration: 1, 
+  duration: 1,
   features: [""],
   isFeatured: false,
-  colorScheme: DEFAULT_COLOR_SCHEME, 
+  colorScheme: DEFAULT_COLOR_SCHEME,
  });
 
  const [featureInput, setFeatureInput] = useState("");
@@ -44,7 +44,7 @@ const PackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
     duration: pkg.duration,
     features: pkg.features,
     isFeatured: pkg.isFeatured,
-    colorScheme: pkg.colorScheme || DEFAULT_COLOR_SCHEME, 
+    colorScheme: pkg.colorScheme || DEFAULT_COLOR_SCHEME,
    });
   }
  }, [pkg]);
@@ -74,7 +74,7 @@ const PackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
   setFormData((prev) => ({
    ...prev,
    colorScheme: {
-    ...prev.colorScheme, 
+    ...prev.colorScheme,
     [type]: color,
    },
   }));
@@ -97,31 +97,31 @@ const PackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
   }));
  };
 
-const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
- try {
-  const url = pkg?.id ? `/api/packages` : "/api/packages";
-  const method = pkg?.id ? "PUT" : "POST";
+  try {
+   const url = pkg?.id ? `/api/packages` : "/api/packages";
+   const method = pkg?.id ? "PUT" : "POST";
 
-  const body = pkg?.id ? {id: pkg.id, ...formData} : formData;
+   const body = pkg?.id ? {id: pkg.id, ...formData} : formData;
 
-  const response = await fetch(url, {
-   method,
-   headers: {
-    "Content-Type": "application/json",
-   },
-   body: JSON.stringify(body),
-  });
+   const response = await fetch(url, {
+    method,
+    headers: {
+     "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+   });
 
-  if (!response.ok) throw new Error("Failed to save package");
+   if (!response.ok) throw new Error("Failed to save package");
 
-  onSubmit();
- } catch (error) {
-  console.error("Error saving package:", error);
-  alert("Failed to save package. Please try again.");
- }
-};
+   onSubmit();
+  } catch (error) {
+   console.error("Error saving package:", error);
+   alert("Failed to save package. Please try again.");
+  }
+ };
 
  return (
   <motion.div
@@ -356,4 +356,4 @@ const handleSubmit = async (e: React.FormEvent) => {
  );
 };
 
-export default PackageForm;
+export default WebMasterPackageForm;

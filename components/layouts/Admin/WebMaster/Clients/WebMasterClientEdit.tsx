@@ -12,7 +12,7 @@ interface EditClientModalProps {
  onUpdate: (client: Client) => void;
 }
 
-export default function EditClientModal({
+export default function WebMasterClientEdit({
  isOpen,
  onClose,
  client,

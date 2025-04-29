@@ -3,7 +3,7 @@
 import {FiAlertTriangle} from "react-icons/fi";
 import {motion} from "framer-motion";
 
-export default function DeleteConfirmationModal({
+export default function WebMasterDeleteModal({
  isOpen,
  onClose,
  onConfirm,

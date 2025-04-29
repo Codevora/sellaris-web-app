@@ -7,7 +7,7 @@ import {
 } from "@/lib/firebase/paymentService";
 import {toast} from "react-toastify";
 import {FiX, FiCreditCard, FiDollarSign, FiSmartphone} from "react-icons/fi";
-import { RiBankCard2Fill } from "react-icons/ri";
+import {RiBankCard2Fill} from "react-icons/ri";
 import {motion, AnimatePresence} from "framer-motion";
 
 const paymentTypes = [
@@ -29,7 +29,7 @@ type FormData = Omit<PaymentMethod, "id" | "createdAt" | "updatedAt"> & {
  ewalletType: "gopay" | "ovo" | "dana" | "shopeepay" | "linkaja";
 };
 
-export default function AddPaymentModal({
+export default function WebMasterAddModal({
  isOpen,
  onClose,
  refreshData,

@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {FiUsers, FiUserCheck, FiUserX} from "react-icons/fi";
 
-export default function ClientStats() {
+export default function WebMasterClientStats() {
  const [stats, setStats] = useState({
   total: 0,
   active: 0,

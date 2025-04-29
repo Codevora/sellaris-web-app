@@ -24,7 +24,7 @@ const ewalletTypes = [
  {value: "linkaja", label: "LinkAja"},
 ];
 
-export default function EditPaymentModal({
+export default function WebMasterEditModal({
  isOpen,
  onClose,
  payment,

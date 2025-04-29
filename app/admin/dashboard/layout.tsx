@@ -1,5 +1,4 @@
 import type {Metadata} from "next";
-import ClientDashboardLayout from "@/components/layouts/Admin/AdminDashboardLayout";
 import { routeMetadata } from "@/types/route-types";
 
 export async function generateMetadata({
@@ -25,5 +24,5 @@ export default function DashboardLayout({
 }: {
  children: React.ReactNode;
 }) {
- return <ClientDashboardLayout>{children}</ClientDashboardLayout>;
+ return <div>{children}</div>;
 }

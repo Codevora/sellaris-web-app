@@ -1,5 +1,4 @@
 "use client";
-
 import {useState, useEffect} from "react";
 import {useSession} from "next-auth/react";
 import {useTranslation} from "react-i18next";
@@ -8,15 +7,15 @@ import {
  SettingsService,
  type SettingsData,
 } from "@/lib/firebase/settingsService";
-import ProfileSection from "./ProfileSection";
 
-import AppearanceSection from "./AppearanceSection";
- 
-import SystemConfigSection from "./SystemConfiguration";
+//components
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
+import WebMasterAppearanceSection from "./WebMasterAppearanceSecton";
+import WebMasterProfileSection from "./WebMasteProfileSection";
+import WebMasterSystemConfigSection from "./WebMasterSystemConfiguration";
 
-export default function SettingsClientPage() {
+export default function WebMasterSettingsPage() {
  const {data: session}: {data: any} = useSession();
  const {t} = useTranslation();
  const [activeTab, setActiveTab] = useState("profile");
@@ -124,19 +123,19 @@ export default function SettingsClientPage() {
      transition={{duration: 0.2}}
      className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
      {activeTab === "profile" && (
-      <ProfileSection
+      <WebMasterProfileSection
        settings={settings?.profile}
        onSave={handleSave}
       />
      )}
      {activeTab === "system" && (
-      <SystemConfigSection
+      <WebMasterSystemConfigSection
        settings={settings?.system}
        onSave={handleSave}
       />
      )}
      {activeTab === "appearance" && (
-      <AppearanceSection
+      <WebMasterAppearanceSection
        settings={settings?.appearance}
        onSave={handleSave}
       />

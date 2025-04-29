@@ -5,13 +5,13 @@ import {
  PaymentService,
  type PaymentMethod,
 } from "@/lib/firebase/paymentService";
-import AddPaymentModal from "./AddPaymentModal";
-import DeleteConfirmationModal from "./PaymentMethod/DeleteConfirmationModal";
-import EditPaymentModal from "./PaymentMethod/EditPaymentModal";
+import WebMasterAddModal from "./WebMasterAddModal";
+import WebMasterDeleteModal from "./WebMasterDeleteModal";
+import WebMasterEditModal from "./WebMasterEditModal";
 import {toast} from "react-toastify";
 import {FiPlus, FiEdit, FiTrash2} from "react-icons/fi";
 
-export default function PaymentMethodsPage() {
+export default function PaymentMethodsWebMaster() {
 const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -161,7 +161,7 @@ const [isLoading, setIsLoading] = useState(true);
     </div>
    )}
 
-   <AddPaymentModal
+   <WebMasterAddModal
     isOpen={isAddModalOpen}
     onClose={() => setIsAddModalOpen(false)}
     refreshData={fetchPaymentMethods}
@@ -169,7 +169,7 @@ const [isLoading, setIsLoading] = useState(true);
 
    {currentPayment && (
     <>
-     <EditPaymentModal
+     <WebMasterEditModal
       isOpen={isEditModalOpen}
       onClose={() => {
        setIsEditModalOpen(false);
@@ -179,7 +179,7 @@ const [isLoading, setIsLoading] = useState(true);
       refreshData={fetchPaymentMethods}
      />
 
-     <DeleteConfirmationModal
+     <WebMasterDeleteModal
       isOpen={isDeleteModalOpen}
       onClose={() => {
        setIsDeleteModalOpen(false);

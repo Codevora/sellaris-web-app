@@ -9,7 +9,6 @@ import {useTranslation} from "react-i18next";
 import {SettingsService} from "@/lib/firebase/settingsService";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
- 
 
 const schema = yup.object().shape({
  name: yup.string().required("Name is required"),
@@ -30,7 +29,7 @@ const schema = yup.object().shape({
   .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
-interface ProfileSectionProps {
+interface WebMasterProfileSectionProps {
  settings?: {
   name?: string;
   photoURL?: string;
@@ -38,10 +37,10 @@ interface ProfileSectionProps {
  onSave: (section: string, data: any) => Promise<boolean>;
 }
 
-export default function ProfileSection({
+export default function WebMasterProfileSection({
  settings,
  onSave,
-}: ProfileSectionProps) {
+}: WebMasterProfileSectionProps) {
  const {data: session} = useSession();
  const {t} = useTranslation();
  const [photo, setPhoto] = useState(settings?.photoURL || "");

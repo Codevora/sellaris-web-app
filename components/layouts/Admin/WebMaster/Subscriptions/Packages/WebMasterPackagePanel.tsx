@@ -2,13 +2,13 @@
 
 import {useState, useEffect} from "react";
 import {motion} from "framer-motion";
-import {FiPlus, FiEdit2, FiTrash2, FiStar, FiCheck} from "react-icons/fi";
+import {FiPlus} from "react-icons/fi";
 import {getPackages, deletePackage} from "@/lib/firebase/packageService";
 import {Package} from "@/types/package";
-import PackageForm from "@/components/layouts/Admin/Packages/PackageForm";
-import PackageList from "@/components/layouts/Admin/Packages/PackageList";
+import WebMasterPackageForm from "./WebMasterPackageForm";
+import WebMasterPackageList from "./WebMasterPackageList";
 
-const PackagePanel = () => {
+const WebMasterPackagePanel = () => {
  const [packages, setPackages] = useState<Package[]>([]);
  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
  const [isFormOpen, setIsFormOpen] = useState(false);
@@ -57,7 +57,7 @@ const PackagePanel = () => {
  };
 
  return (
-  <div className="container mx-auto px-4 py-8">
+  <div className="container mx-auto     ">
    <motion.div
     initial={{opacity: 0, y: 20}}
     animate={{opacity: 1, y: 0}}
@@ -79,7 +79,7 @@ const PackagePanel = () => {
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
      </div>
     ) : (
-     <PackageList
+     <WebMasterPackageList
       packages={packages}
       onEdit={handleEditPackage}
       onDelete={handleDeletePackage}
@@ -88,7 +88,7 @@ const PackagePanel = () => {
    </motion.div>
 
    {isFormOpen && (
-    <PackageForm
+    <WebMasterPackageForm
      pkg={selectedPackage}
      onClose={() => setIsFormOpen(false)}
      onSubmit={handleFormSubmit}
@@ -98,4 +98,4 @@ const PackagePanel = () => {
  );
 };
 
-export default PackagePanel;
+export default WebMasterPackagePanel;

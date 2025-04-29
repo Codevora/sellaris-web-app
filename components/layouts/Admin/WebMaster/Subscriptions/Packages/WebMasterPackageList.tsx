@@ -2,8 +2,8 @@
 import {motion} from "framer-motion";
 import {FiEdit2, FiTrash2, FiStar, FiCheck} from "react-icons/fi";
 import {Package} from "@/types/package";
-import {formatRupiah} from "@/lib/utils/formatCurrency";  
-import { useEffect, useState } from "react";
+import {formatRupiah} from "@/lib/utils/formatCurrency";
+import {useEffect, useState} from "react";
 
 // Default color scheme for packages that don't have one
 const DEFAULT_COLOR_SCHEME = {
@@ -12,32 +12,32 @@ const DEFAULT_COLOR_SCHEME = {
  text: "#1e3a8a", // blue-900
 };
 
-interface PackageListProps {
+interface WebMasterPackageListProps {
  packages: Package[];
  onEdit: (pkg: Package) => void;
  onDelete: (id: string) => void;
 }
 
-const PackageList = ({onEdit, onDelete}: PackageListProps) => {
-   const [packages, setPackages] = useState<Package[]>([]);
-   const [_isLoading, setIsLoading] = useState(true);
+const WebMasterPackageList = ({onEdit, onDelete}: WebMasterPackageListProps) => {
+ const [packages, setPackages] = useState<Package[]>([]);
+ const [_isLoading, setIsLoading] = useState(true);
 
-   useEffect(() => {
-    const fetchPackages = async () => {
-     try {
-      const response = await fetch("/api/packages");
-      if (!response.ok) throw new Error("Failed to fetch packages");
-      const data = await response.json();
-      setPackages(data);
-     } catch (error) {
-      console.error("Error:", error);
-     } finally {
-      setIsLoading(false);
-     }
-    };
+ useEffect(() => {
+  const fetchPackages = async () => {
+   try {
+    const response = await fetch("/api/packages");
+    if (!response.ok) throw new Error("Failed to fetch packages");
+    const data = await response.json();
+    setPackages(data);
+   } catch (error) {
+    console.error("Error:", error);
+   } finally {
+    setIsLoading(false);
+   }
+  };
 
-    fetchPackages();
-   }, []);
+  fetchPackages();
+ }, []);
  if (packages.length === 0) {
   return (
    <motion.div
@@ -137,4 +137,4 @@ const PackageList = ({onEdit, onDelete}: PackageListProps) => {
  );
 };
 
-export default PackageList;
+export default WebMasterPackageList;

@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {SettingsService} from "@/lib/firebase/settingsService";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
- 
+
 const currencies = [
  {code: "IDR", name: "Indonesian Rupiah"},
  {code: "USD", name: "US Dollar"},
@@ -20,7 +20,7 @@ const timezones = [
  {value: "Europe/London", label: "Europe/London (GMT)"},
 ];
 
-interface SystemConfigSectionProps {
+interface WebMasterSystemConfigSectionProps {
  settings?: {
   currency?: string;
   timezone?: string;
@@ -32,10 +32,10 @@ interface SystemConfigSectionProps {
  onSave: (section: string, data: any) => Promise<boolean>;
 }
 
-export default function SystemConfigSection({
+export default function WebMasterSystemConfigSection({
  settings,
  onSave,
-}: SystemConfigSectionProps) {
+}: WebMasterSystemConfigSectionProps) {
  const {t} = useTranslation();
  const [config, setConfig] = useState({
   currency: settings?.currency || "IDR",

@@ -29,7 +29,7 @@ export default function withAuth(
    }
 
    const redirectPath =
-    token.role === "admin" ? "/admin/dashboard" : "/member/dashboard";
+    token.role === "admin" ? "/admin/webmaster" : "/admin/dashboard";
 
    return NextResponse.redirect(new URL(redirectPath, req.url));
   }
