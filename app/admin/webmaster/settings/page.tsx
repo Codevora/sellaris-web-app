@@ -1,5 +1,5 @@
 import {Metadata} from "next";
-import SettingsClientPage from "@/components/layouts/Admin/Settings/SettingsClientPage";
+import WebMasterSettingsPage from "@/components/layouts/Admin/WebMaster/Settings/WebMasterSettingsPage";
 
 export const metadata: Metadata = {
  title: "Settings",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsPage() {
- return <SettingsClientPage />;
+ return <WebMasterSettingsPage />;
 }
