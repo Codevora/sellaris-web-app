@@ -30,7 +30,9 @@ const Navbar = () => {
    animate={{y: 0}}
    transition={{type: "spring", stiffness: 100}}
    className={`fixed w-full z-50 transition-all duration-300 ${
-    scrolled ? "bg-primary/95 backdrop-blur-md py-3" : "bg-primary/90 py-4"
+    scrolled
+     ? "bg-gradient-to-br from-teal-600 to-teal-700 backdrop-blur-md py-3 2xl:py-5"
+     : "bg-gradient-to-br from-teal-600 to-teal-700 py-4 2xl:py-6"
    }`}>
    <div className="container mx-auto px-4">
     <div className="flex justify-between items-center">

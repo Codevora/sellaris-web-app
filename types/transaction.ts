@@ -1,4 +1,4 @@
-export type TransactionStatus = "pending" | "success" | "failed" | "refunded";
+export type TransactionStatus = "pending" | "success" | "failed";
 
 export interface Transaction {
  id?: string;
@@ -9,23 +9,17 @@ export interface Transaction {
  amount: number;
  status: TransactionStatus;
  paymentMethod: string;
- paymentDetails?: {
-  provider?: string;
-  transactionId?: string;
-  accountNumber?: string;
- };
- date: Date;
- expiryDate: Date;
  proofOfPayment?: string;
- notes?: string;
+ expiryDate: Date;
+ date: Date;
  createdAt?: Date;
  updatedAt?: Date;
 }
 
 export interface TransactionStats {
  totalRevenue: number;
- activeSubscribers: number;
  pendingTransactions: number;
+ activeSubscribers?: number; // Now optional
  popularPackage: {
   name: string;
   count: number;

@@ -103,7 +103,7 @@ export default function WebMasterSidebar() {
  };
 
  return (
-  <div className="fixed left-0 top-0 h-full w-[280px] bg-gradient-to-b from-blue-900/90 to-blue-800/90 text-white p-5 flex flex-col rounded-r-xl shadow-xl z-50">
+  <div className="fixed left-0 top-0 h-full w-[280px] bg-gradient-to-br from-teal-600 to-teal-700 text-white p-5 flex flex-col rounded-r-xl shadow-xl z-50">
    {/* Main content container */}
    <div className="flex flex-col w-full h-full">
     {/* Header and menu items */}
