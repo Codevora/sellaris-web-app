@@ -4,7 +4,17 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import {FadeIn, StaggerContainer} from "@/components/AnimatedComponent";
 import CommentSection from "@/components/CommentSection";
-import {BlogPost} from "@/types/blog";
+
+interface BlogPost {
+ id: string;
+ title: string;
+ excerpt: string;
+ content: string;
+ category: string;
+ createdAt: string; // Diubah menjadi string karena menerima ISO string
+ author: string;
+ tags?: string[];
+}
 
 export async function generateMetadata({
  params,
@@ -12,9 +22,9 @@ export async function generateMetadata({
  params: {id: string};
 }): Promise<Metadata> {
  try {
-  const response = await fetch(
-   `${process.env.NEXT_PUBLIC_SITE_URL}/api/blog/${params.id}`
-  );
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/blog/${params.id}`);
+
   if (!response.ok) return {title: "Post not found"};
 
   const {data: post} = await response.json();
@@ -26,11 +36,6 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
    },
-   twitter: {
-    card: "summary_large_image",
-    title: post.title,
-    description: post.excerpt,
-   },
   };
  } catch (error) {
   return {
@@ -39,16 +44,39 @@ export async function generateMetadata({
  }
 }
 
-const BlogPostPage = async ({params}: {params: {id: string}}) => {
+const formatDate = (dateString: string) => {
+ const date = new Date(dateString);
+ return date.toLocaleDateString("id-ID", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+ });
+};
+
+const formatShortDate = (dateString: string) => {
+ const date = new Date(dateString);
+ return date.toLocaleDateString("id-ID", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+ });
+};
+
+export default async function BlogPostPage({params}: {params: {id: string}}) {
  try {
-  const response = await fetch(
-   `${process.env.NEXT_PUBLIC_SITE_URL}/api/blog/${params.id}`
-  );
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/blog/${params.id}`, {
+   next: {revalidate: 60}, // ISR: Revalidate setiap 60 detik
+  });
+
   if (!response.ok) return notFound();
 
   const {data: post} = await response.json();
 
-  const shareUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.id}`;
+  // Validasi data yang diperlukan
+  if (!post.title || !post.content) {
+   return notFound();
+  }
 
   return (
    <div className="bg-gray-50 min-h-screen">
@@ -62,20 +90,18 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
 
       <StaggerContainer>
        <article className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="relative h-64 md:h-96 w-full"></div>
+        {/* Header dengan gambar */}
+        <div className="relative h-64 md:h-96 w-full bg-gray-100">
+         {/* Placeholder untuk gambar */}
+        </div>
 
         <div className="p-6 md:p-8">
+         {/* Metadata post */}
          <FadeIn>
           <div className="flex flex-wrap items-center text-sm text-gray-500 mb-4 gap-2">
            <div className="flex items-center">
             <FaCalendarAlt className="mr-2" />
-            <span>
-             {post.createdAt.toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-             })}
-            </span>
+            <span>{formatDate(post.createdAt)}</span>
            </div>
            <div className="flex items-center">
             <FaUser className="mr-2" />
@@ -89,12 +115,14 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
           </div>
          </FadeIn>
 
+         {/* Judul */}
          <FadeIn>
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
            {post.title}
           </h1>
          </FadeIn>
 
+         {/* Konten */}
          <FadeIn>
           <div
            className="prose max-w-none text-gray-700"
@@ -102,6 +130,7 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
           />
          </FadeIn>
 
+         {/* Tags */}
          {post.tags && post.tags.length > 0 && (
           <FadeIn className="mt-8">
            <div className="flex items-center gap-2">
@@ -118,33 +147,26 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
            </div>
           </FadeIn>
          )}
-         
+
+         {/* Komentar */}
          <CommentSection postId={post.id} />
-         <FadeIn className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-           <div>
-            <h3 className="text-sm font-medium text-gray-500">
-             Bagikan artikel ini:
-            </h3>
-           </div>
-          </div>
-         </FadeIn>
         </div>
        </article>
       </StaggerContainer>
 
-      {/* Related Posts */}
+      {/* Artikel Terkait */}
       <FadeIn className="mt-16">
        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
         Artikel Terkait
        </h2>
        <div className="grid md:grid-cols-2 gap-6">
+        {/* Contoh artikel terkait - bisa diganti dengan fetch data */}
         {[1, 2].map((item) => (
          <div
           key={item}
           className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all">
           <div className="flex">
-           <div className="flex-shrink-0 w-24 h-24 relative"></div>
+           <div className="flex-shrink-0 w-24 h-24 bg-gray-100"></div>
            <div className="p-4">
             <h3 className="font-medium text-gray-800 mb-1">
              <Link
@@ -156,11 +178,7 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
              </Link>
             </h3>
             <p className="text-xs text-gray-500">
-             {post.createdAt.toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-             })}
+             {formatShortDate(post.createdAt)}
             </p>
            </div>
           </div>
@@ -173,8 +191,7 @@ const BlogPostPage = async ({params}: {params: {id: string}}) => {
    </div>
   );
  } catch (error) {
+  console.error("Error in BlogPostPage:", error);
   return notFound();
  }
-};
-
-export default BlogPostPage;
+}

@@ -17,11 +17,13 @@ export async function GET(request: Request, {params}: {params: {id: string}}) {
   const post = {
    id: docSnap.id,
    ...docSnap.data(),
-   createdAt: docSnap.data().createdAt.toDate(),
+   // Convert Firestore Timestamp to ISO string
+   createdAt: docSnap.data().createdAt?.toDate().toISOString(),
   };
 
   return NextResponse.json({success: true, data: post});
  } catch (error) {
+  console.error("Error fetching post:", error);
   return NextResponse.json(
    {success: false, message: "Failed to fetch post"},
    {status: 500}

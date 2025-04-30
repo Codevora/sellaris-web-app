@@ -239,8 +239,8 @@ export default function BlogUserPage({
               <MotionButton whileHover={{x: 5}}>
                <Link
                 href={`/blog/${post.id}`}
-                className="flex items-center gap-1 text-teal-600 font-medium text-sm hover:underline">
-                Baca selengkapnya <FaArrowRightLong className="text-xs" />
+                className="hover:text-teal-500">
+                Baca selengkapnya
                </Link>
               </MotionButton>
              </div>
