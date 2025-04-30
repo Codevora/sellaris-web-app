@@ -23,7 +23,7 @@ export default function RootLayout({
  children: React.ReactNode;
 }>) {
  const pathname = usePathname();
- const disableNavbar = ["/login", "/register", "/admin", "/pricing/checkout"];
+ const disableNavbar = ["/login", "/register", "/admin", "/pricing/checkout", "/unauthorized"];
  const showNavbar = !disableNavbar.some(
   (path) => pathname === path || pathname.startsWith(`${path}/`)
  );

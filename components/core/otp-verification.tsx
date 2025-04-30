@@ -4,12 +4,22 @@ import {signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {useState, useRef, useEffect} from "react";
 
-export default function OTPVerification({email}: {email: string}) {
+interface OTPVerificationProps {
+ email: string;
+ onVerificationSuccess: () => void;
+}
+
+export default function OTPVerification({
+ email,
+ onVerificationSuccess,
+}: OTPVerificationProps) {
  const router = useRouter();
  const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
  const [activeInput, setActiveInput] = useState(0);
  const [error, setError] = useState("");
  const [isLoading, setIsLoading] = useState(false);
+ const [resendDisabled, setResendDisabled] = useState(true);
+ const [resendTimer, setResendTimer] = useState(30);
 
  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -46,43 +56,82 @@ export default function OTPVerification({email}: {email: string}) {
   inputRefs.current[activeInput]?.focus();
  }, [activeInput]);
 
- const handleSubmit = async () => {
-  setIsLoading(true);
+ useEffect(() => {
+  // Resend OTP timer
+  if (resendTimer > 0) {
+   const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+   return () => clearTimeout(timer);
+  } else {
+   setResendDisabled(false);
+  }
+ }, [resendTimer]);
+
+ const handleResendOTP = async () => {
+  setResendDisabled(true);
+  setResendTimer(30);
   setError("");
 
   try {
-   const otpCode = otp.join("");
-   const response = await fetch("/api/auth/verify", {
+   const response = await fetch("/api/auth/resend-otp", {
     method: "POST",
     headers: {
      "Content-Type": "application/json",
     },
-    body: JSON.stringify({email, otp: otpCode}),
+    body: JSON.stringify({email}),
    });
 
    const data = await response.json();
 
    if (!response.ok) {
-    throw new Error(data.message || "Verification failed");
+    throw new Error(data.message || "Failed to resend OTP");
    }
-
-   const signInResponse = await signIn("credentials", {
-    email,
-    redirect: false,
-   });
-
-   if (signInResponse?.error) {
-    throw new Error(signInResponse.error);
-   }
-
-   router.push("/dashboard");
   } catch (err) {
    const error = err as Error;
    setError(error.message);
-  } finally {
-   setIsLoading(false);
   }
  };
+
+const handleSubmit = async () => {
+ setIsLoading(true);
+ setError("");
+
+ try {
+  const otpCode = otp.join("");
+  const response = await fetch("/api/auth/verify", {
+   method: "POST",
+   headers: {
+    "Content-Type": "application/json",
+   },
+   body: JSON.stringify({email, otp: otpCode}),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+   throw new Error(data.message || "Verification failed");
+  }
+
+  // Auto-login after verification
+  const signInResponse = await signIn("credentials", {
+   email,
+   redirect: false,
+  });
+
+  if (signInResponse?.error) {
+   throw new Error(signInResponse.error);
+  }
+
+  // Redirect based on role (if available in response)
+  const redirectPath =
+   data.user?.role === "admin" ? "/admin/webmaster" : "/admin/dashboard";
+  router.push(redirectPath);
+ } catch (err) {
+  const error = err as Error;
+  setError(error.message);
+ } finally {
+  setIsLoading(false);
+ }
+};
 
  return (
   <motion.div
@@ -90,8 +139,8 @@ export default function OTPVerification({email}: {email: string}) {
    animate={{opacity: 1}}
    className="bg-white/40 backdrop-blur-lg w-[400px] p-6 rounded-lg">
    <div className="text-center mb-6">
-    <h2 className="text-2xl font-bold text-gray-800">Verify Email</h2>
-    <p className="text-gray-600">Code sent to {email}</p>
+    <h2 className="text-2xl font-bold text-gray-800">Verifikasi Email</h2>
+    <p className="text-gray-600">Kode OTP telah dikirim ke {email}</p>
    </div>
 
    <div className="flex justify-center gap-3 mb-6">
@@ -123,12 +172,19 @@ export default function OTPVerification({email}: {email: string}) {
       ? "bg-gray-400 cursor-not-allowed"
       : "bg-primary hover:bg-primary/90"
     }`}>
-    {isLoading ? "Verifying..." : "Verify"}
+    {isLoading ? "Memverifikasi..." : "Verifikasi"}
    </button>
 
    <div className="text-center mt-4 text-sm text-gray-600">
-    Didn&apos;t receive code?{" "}
-    <button className="text-blue-600 hover:underline">Resend</button>
+    Tidak menerima kode?{" "}
+    <button
+     onClick={handleResendOTP}
+     disabled={resendDisabled}
+     className={`${
+      resendDisabled ? "text-gray-400" : "text-blue-600 hover:underline"
+     }`}>
+     {resendDisabled ? `Kirim ulang (${resendTimer}s)` : "Kirim ulang"}
+    </button>
    </div>
   </motion.div>
  );

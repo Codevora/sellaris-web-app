@@ -15,6 +15,11 @@ export async function POST(request: Request) {
  return NextResponse.json({
   status: true,
   message: result.message,
-  user: result.user,
+  user: {
+   id: result.user?.id,
+   email: result.user?.email,
+   fullname: result.user?.fullname,
+   role: result.user?.role || "member", // Default role jika tidak ada
+  },
  });
 }

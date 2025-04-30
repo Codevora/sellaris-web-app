@@ -3,6 +3,8 @@ import {motion} from "framer-motion";
 import {useState} from "react";
 import OTPVerification from "@/components/core/otp-verification";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
+import { CompanyForm } from "./CompanyForm";
 
 const containerVariants = {
  hidden: {opacity: 0, y: 20},
@@ -22,57 +24,93 @@ const itemVariants = {
 };
 
 export default function RegisterForm() {
- const [error, setError] = useState("");
- const [isLoading, setIsLoading] = useState(false);
- const [email, setEmail] = useState("");
- const [showOtp, setShowOtp] = useState(false);
+const [error, setError] = useState("");
+const [isLoading, setIsLoading] = useState(false);
+const [email, setEmail] = useState("");
+const [showOtp, setShowOtp] = useState(false);
+const [showCompanyForm, setShowCompanyForm] = useState(false);
+const [formData, setFormData] = useState({
+ fullname: "",
+ email: "",
+ phone: "",
+ password: "",
+});
+const [acceptedTerms, setAcceptedTerms] = useState(false);
+const router = useRouter();
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setError("");
-  setIsLoading(true);
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ e.preventDefault();
+ setError("");
+ setIsLoading(true);
 
-  const formData = new FormData(e.currentTarget);
-  const data = {
-   fullname: formData.get("fullname") as string,
-   email: formData.get("email") as string,
-   phone: formData.get("phone") as string,
-   password: formData.get("password") as string,
-  };
-
-  if (!data.email || !data.password) {
-   setError("Email and password are required");
-   setIsLoading(false);
-   return;
-  }
-
-  try {
-   const res = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: {
-     "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-   });
-
-   const result = await res.json();
-
-   if (!res.ok) {
-    throw new Error(result.message || "Registration failed");
-   }
-
-   setEmail(data.email);
-   setShowOtp(true);
-  } catch (error: any) {
-   setError(error.message);
-  } finally {
-   setIsLoading(false);
-  }
+ const formData = new FormData(e.currentTarget);
+ const data = {
+  fullname: formData.get("fullname") as string,
+  email: formData.get("email") as string,
+  phone: formData.get("phone") as string,
+  password: formData.get("password") as string,
  };
 
- if (showOtp) {
-  return <OTPVerification email={email} />;
+ if (!data.email || !data.password) {
+  setError("Email and password are required");
+  setIsLoading(false);
+  return;
  }
+
+ if (!acceptedTerms) {
+  setError("You must accept the terms and conditions");
+  setIsLoading(false);
+  return;
+ }
+
+ try {
+  const res = await fetch("/api/auth/register", {
+   method: "POST",
+   headers: {
+    "Content-Type": "application/json",
+   },
+   body: JSON.stringify(data),
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+   throw new Error(result.message || "Registration failed");
+  }
+
+  setEmail(data.email);
+  setFormData(data);
+  setShowOtp(true);
+ } catch (error: any) {
+  setError(error.message);
+ } finally {
+  setIsLoading(false);
+ }
+};
+
+const handleOTPVerificationSuccess = () => {
+ setShowOtp(false);
+ setShowCompanyForm(true);
+};
+
+if (showOtp) {
+ return (
+  <OTPVerification
+   email={email}
+   onVerificationSuccess={handleOTPVerificationSuccess}
+  />
+ );
+}
+
+if (showCompanyForm) {
+ return (
+  <CompanyForm
+   initialData={formData}
+   onSkip={() => router.push("/dashboard")}
+  />
+ );
+}
+
 
  return (
   <motion.div
@@ -154,13 +192,48 @@ export default function RegisterForm() {
       />
      </motion.div>
 
+     <motion.div
+      variants={itemVariants}
+      className="flex items-start">
+      <div className="flex items-center h-5">
+       <input
+        id="terms"
+        name="terms"
+        type="checkbox"
+        checked={acceptedTerms}
+        onChange={(e) => setAcceptedTerms(e.target.checked)}
+        className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+       />
+      </div>
+      <div className="ml-3 text-sm">
+       <label
+        htmlFor="terms"
+        className="font-medium text-gray-700">
+        Saya menyetujui{" "}
+        <Link
+         href="/terms"
+         className="text-blue-600 hover:text-blue-500">
+         Syarat dan Ketentuan
+        </Link>{" "}
+        dan{" "}
+        <Link
+         href="/privacy"
+         className="text-blue-600 hover:text-blue-500">
+         Kebijakan Privasi
+        </Link>
+       </label>
+      </div>
+     </motion.div>
+
      {error && <div className="text-red-500 text-sm text-center">{error}</div>}
 
      <motion.div variants={itemVariants}>
       <button
        type="submit"
-       disabled={isLoading}
-       className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 disabled:opacity-75">
+       disabled={isLoading || !acceptedTerms}
+       className={`w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 ${
+        isLoading || !acceptedTerms ? "opacity-75 cursor-not-allowed" : ""
+       }`}>
        {isLoading ? (
         <span className="flex items-center justify-center">
          <svg

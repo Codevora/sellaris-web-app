@@ -2,7 +2,7 @@
 import {signOut} from "next-auth/react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {motion} from "framer-motion";
+import {motion, AnimatePresence} from "framer-motion";
 import {
  FaUser,
  FaSignOutAlt,
@@ -17,6 +17,12 @@ import {RiShieldKeyholeFill} from "react-icons/ri";
 import {IoIosArrowDropright} from "react-icons/io";
 import {MdDashboard} from "react-icons/md";
 import {useState} from "react";
+
+interface WebMasterSidebarProps {
+ isMobile: boolean;
+ sidebarOpen: boolean;
+ setSidebarOpen: (open: boolean) => void;
+}
 
 const webmasterLinks = [
  {name: "Dashboard", path: "/admin/webmaster", icon: <MdDashboard />},
@@ -78,7 +84,11 @@ const webmasterLinks = [
  },
 ];
 
-export default function WebMasterSidebar() {
+export default function WebMasterSidebar({
+ isMobile,
+ sidebarOpen,
+ setSidebarOpen,
+}: WebMasterSidebarProps) {
  const pathname = usePathname();
  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
   {}
@@ -91,7 +101,6 @@ export default function WebMasterSidebar() {
   }));
  };
 
- // Fungsi untuk mengecek apakah link aktif
  const isActive = (path: string, exact: boolean = false) => {
   if (exact) {
    return pathname === path;
@@ -102,95 +111,126 @@ export default function WebMasterSidebar() {
   );
  };
 
+ const handleLinkClick = (path: string, hasSubItems: boolean) => {
+  if (isMobile && !hasSubItems) {
+   setSidebarOpen(false);
+  }
+ };
+
  return (
-  <div className="fixed left-0 top-0 h-full w-[280px] bg-gradient-to-br from-teal-600 to-teal-700 text-white p-5 flex flex-col rounded-r-xl shadow-xl z-50">
-   {/* Main content container */}
-   <div className="flex flex-col w-full h-full">
-    {/* Header and menu items */}
-    <div className="flex-1 overflow-y-auto">
-     <Link href="/admin/webmaster">
-      <h1
-       className="text-3xl font-bold mb-8 italic text-white text-center"
-       style={{fontFamily: "'Raleway', sans-serif"}}>
-       SELLARIS
-      </h1>
-     </Link>
+  <>
+   <AnimatePresence>
+    {(sidebarOpen || !isMobile) && (
+     <motion.div
+      initial={isMobile ? {x: -280} : {x: 0}}
+      animate={isMobile ? {x: sidebarOpen ? 0 : -280} : {x: 0}}
+      exit={{x: -280}}
+      transition={{type: "spring", stiffness: 300, damping: 30}}
+      className={`fixed left-0 top-0 h-full w-[280px] bg-gradient-to-br from-teal-600 to-teal-700 text-white p-5 flex flex-col rounded-r-xl shadow-xl z-40 ${
+       isMobile && !sidebarOpen ? "hidden" : ""
+      }`}>
+      {/* Main content container */}
+      <div className="flex flex-col w-full h-full">
+       {/* Header and menu items */}
+       <div className="flex-1 overflow-hidden">
+        <Link
+         href="/"
+         onClick={() => isMobile && setSidebarOpen(false)}>
+         <h1
+          className="text-3xl font-bold mb-8 italic text-white text-center"
+          style={{fontFamily: "'Raleway', sans-serif"}}>
+          SELLARIS
+         </h1>
+        </Link>
 
-     <ul className="flex flex-col gap-2 w-full">
-      {webmasterLinks.map((link) => (
-       <li
-        key={link.path}
-        className="overflow-visible">
-        <div className="flex flex-col">
-         <Link
-          href={link.path}
-          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-blue-700/50 transition-all ${
-           isActive(link.path, link.path === "/admin/webmaster")
-            ? "bg-blue-700/80 font-medium"
-            : ""
-          }`}
-          onClick={(e) => {
-           if (link.subItems) {
-            e.preventDefault();
-            toggleItemExpand(link.path);
-           }
-          }}>
-          <span className="text-xl min-w-[24px] flex justify-center">
-           {link.icon}
-          </span>
-          <span className="flex-1 text-left">{link.name}</span>
-          {link.subItems && (
-           <motion.span
-            animate={{
-             rotate: expandedItems[link.path] ? 90 : 0,
-            }}>
-            <IoIosArrowDropright />
-           </motion.span>
-          )}
-         </Link>
+        <ul className="flex flex-col gap-2 w-full">
+         {webmasterLinks.map((link) => (
+          <li
+           key={link.path}
+           className="overflow-visible">
+           <div className="flex flex-col">
+            <Link
+             href={link.path}
+             className={`flex items-center gap-3 2xl:p-3 xl:p-2 rounded-lg hover:bg-teal-700/50 transition-all ${
+              isActive(link.path, link.path === "/admin/webmaster")
+               ? "bg-teal-700 font-medium"
+               : ""
+             }`}
+             onClick={(e) => {
+              if (link.subItems) {
+               e.preventDefault();
+               toggleItemExpand(link.path);
+              }
+              handleLinkClick(link.path, !!link.subItems);
+             }}>
+             <span className="text-xl min-w-[24px] flex justify-center">
+              {link.icon}
+             </span>
+             <span className="flex-1 text-left">{link.name}</span>
+             {link.subItems && (
+              <motion.span
+               animate={{
+                rotate: expandedItems[link.path] ? 90 : 0,
+               }}>
+               <IoIosArrowDropright />
+              </motion.span>
+             )}
+            </Link>
 
-         {link.subItems && expandedItems[link.path] && (
-          <motion.ul
-           initial={{opacity: 0, height: 0}}
-           animate={{opacity: 1, height: "auto"}}
-           exit={{opacity: 0, height: 0}}
-           className="ml-8 pl-3 border-l-2 border-blue-600/30">
-           {link.subItems.map((subItem) => (
-            <li
-             key={subItem.path}
-             className="py-1.5">
-             <Link
-              href={subItem.path}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded hover:bg-blue-700/30 ${
-               pathname === subItem.path
-                ? "text-blue-200 font-medium"
-                : "text-blue-100"
-              }`}>
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-              {subItem.name}
-             </Link>
-            </li>
-           ))}
-          </motion.ul>
-         )}
-        </div>
-       </li>
-      ))}
-     </ul>
-    </div>
+            {link.subItems && expandedItems[link.path] && (
+             <motion.ul
+              initial={{opacity: 0, height: 0}}
+              animate={{opacity: 1, height: "auto"}}
+              exit={{opacity: 0, height: 0}}
+              className="ml-8 pl-3 border-l-2 border-blue-600/30">
+              {link.subItems.map((subItem) => (
+               <li
+                key={subItem.path}
+                className="py-1.5">
+                <Link
+                 href={subItem.path}
+                 className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded hover:bg-teal-700/30 ${
+                  pathname === subItem.path
+                   ? "text-white font-medium"
+                   : "text-white"
+                 }`}
+                 onClick={() => handleLinkClick(subItem.path, false)}>
+                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                 {subItem.name}
+                </Link>
+               </li>
+              ))}
+             </motion.ul>
+            )}
+           </div>
+          </li>
+         ))}
+        </ul>
+       </div>
 
-    {/* Footer with sign out button */}
-    <div className="w-full pt-4 pb-2">
-     <motion.button
-      onClick={() => signOut()}
-      className="flex items-center gap-3 bg-blue-700 hover:bg-blue-600 text-white w-full py-2.5 px-4 rounded-lg cursor-pointer transition-colors"
-      whileHover={{scale: 1.02}}
-      whileTap={{scale: 0.98}}>
-      <FaSignOutAlt />
-      <span>Sign Out</span>
-     </motion.button>
-    </div>
-   </div>
-  </div>
+       {/* Footer with sign out button */}
+       <div className="w-full pt-4 pb-2">
+        <motion.button
+         onClick={() => signOut()}
+         className="flex items-center gap-3 bg-teal-800 hover:bg-teal-600 text-white w-full py-2.5 px-4 rounded-lg cursor-pointer transition-colors"
+         whileHover={{scale: 1.02}}
+         whileTap={{scale: 0.98}}>
+         <FaSignOutAlt />
+         <span>Sign Out</span>
+        </motion.button>
+       </div>
+      </div>
+     </motion.div>
+    )}
+   </AnimatePresence>
+
+   {/* Overlay for mobile */}
+   {isMobile && sidebarOpen && (
+    <div
+     className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+     onClick={() => setSidebarOpen(false)}
+    />
+   )}
+  </>
  );
 }

@@ -1,19 +1,85 @@
-import WebMasterSidebar from "@/components/layouts/Admin/WebMaster/WebMasterSidebar";
+"use client"
 
-export const metadata = {
- title: "Dashboard",
- description: "Dashboard",
-};
+import WebMasterSidebar from "@/components/layouts/Admin/WebMaster/WebMasterSidebar";
+import {useEffect, useState} from "react";
 
 export default function ClientDashboardLayout({
  children,
 }: {
  children: React.ReactNode;
 }) {
+ const [isMobile, setIsMobile] = useState(false);
+ const [sidebarOpen, setSidebarOpen] = useState(false);
+
+ useEffect(() => {
+  const handleResize = () => {
+   const mobile = window.innerWidth < 1024;
+   setIsMobile(mobile);
+   // On desktop, always keep sidebar open
+   if (!mobile) {
+    setSidebarOpen(true);
+   }
+  };
+
+  // Set initial state
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+ }, []);
+
  return (
-  <div className="flex min-h-screen">
-   <WebMasterSidebar />
-   <main className="ml-[290px] p-6 w-full">{children}</main>
+  <div className="flex min-h-screen bg-gray-50">
+   {/* Mobile toggle button */}
+   {isMobile && (
+    <button
+     onClick={() => setSidebarOpen(!sidebarOpen)}
+     className="fixed top-4 left-4 z-50 p-2 rounded-md bg-teal-600 text-white lg:hidden">
+     {sidebarOpen ? (
+      <svg
+       xmlns="http://www.w3.org/2000/svg"
+       className="h-6 w-6"
+       fill="none"
+       viewBox="0 0 24 24"
+       stroke="currentColor">
+       <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M6 18L18 6M6 6l12 12"
+       />
+      </svg>
+     ) : (
+      <svg
+       xmlns="http://www.w3.org/2000/svg"
+       className="h-6 w-6"
+       fill="none"
+       viewBox="0 0 24 24"
+       stroke="currentColor">
+       <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 12h16M4 18h16"
+       />
+      </svg>
+     )}
+    </button>
+   )}
+
+   <WebMasterSidebar
+    isMobile={isMobile}
+    sidebarOpen={sidebarOpen}
+    setSidebarOpen={setSidebarOpen}
+   />
+
+   <main
+    className={`
+          flex-1 p-4 md:p-6 transition-all duration-300
+          ${sidebarOpen && isMobile ? "ml-0" : ""}
+          ${!isMobile ? "ml-[280px]" : ""}
+        `}>
+    {children}
+   </main>
   </div>
  );
 }

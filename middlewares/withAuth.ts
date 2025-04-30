@@ -17,31 +17,51 @@ export default function withAuth(
    secret: process.env.NEXTAUTH_SECRET,
   });
 
+  // Handle auth pages (login/register) for authenticated users
   const isAuthPage = ["/login", "/register"].includes(pathname);
-
   if (isAuthPage && token) {
-   return NextResponse.redirect(new URL("/", req.url));
+   const redirectPath =
+    token.role === "admin" ? "/admin/webmaster" : "/admin/dashboard";
+   return NextResponse.redirect(new URL(redirectPath, req.url));
   }
 
+  // Handle dashboard redirect based on role
   if (pathname === "/dashboard") {
    if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
    }
-
    const redirectPath =
     token.role === "admin" ? "/admin/webmaster" : "/admin/dashboard";
-
    return NextResponse.redirect(new URL(redirectPath, req.url));
   }
 
-  if (pathname.startsWith("/admin") && token?.role !== "admin") {
-   return NextResponse.redirect(new URL("/login", req.url));
+  // Handle admin routes
+  if (pathname.startsWith("/admin/webmaster")) {
+   if (!token || token.role !== "admin") {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+   }
   }
 
-  if (pathname.startsWith("/member") && token?.role !== "member") {
-   return NextResponse.redirect(new URL("/login", req.url));
+  if (pathname.startsWith("/admin/dashboard")) {
+   if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+   }
+   if (token.role === "admin") {
+    return NextResponse.redirect(new URL("/admin/webmaster", req.url));
+   }
+   if (token.role !== "member") {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+   }
   }
 
+  // Handle member routes
+  if (pathname.startsWith("/member")) {
+   if (!token || token.role !== "member") {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+   }
+  }
+
+  // Handle protected routes
   const isProtectedRoute = requireAuth.some(
    (route) =>
     pathname.startsWith(route) || pathname === route.replace(/\/\*$/, "")

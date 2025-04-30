@@ -133,6 +133,34 @@ export async function verifyOTP(email: string, otp: string) {
  }
 }
 
+export async function saveCompanyData(userId: string, companyData: any) {
+ try {
+  const companyRef = await addDoc(collection(firestore, "companies"), {
+   ...companyData,
+   userId,
+   createdAt: new Date(),
+   updatedAt: new Date(),
+  });
+
+  // Update user document to reference this company
+  await updateDoc(doc(firestore, "users", userId), {
+   companyId: companyRef.id,
+  });
+
+  return {
+   status: true,
+   message: "Company data saved successfully",
+   companyId: companyRef.id,
+  };
+ } catch (error) {
+  console.error("Error saving company data:", error);
+  return {
+   status: false,
+   message: "Failed to save company data",
+  };
+ }
+}
+
 export async function login({email}: {email: string}) {
  const q = query(collection(firestore, "users"), where("email", "==", email));
  const snapshot = await getDocs(q);
