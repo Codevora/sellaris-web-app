@@ -2,6 +2,8 @@ import {NextResponse} from "next/server";
 import {getDocs, collection, query, orderBy, where} from "firebase/firestore";
 import {db} from "@/lib/firebase/init";
 
+export const dynamic = "force-dynamic"; // Tambahkan ini
+
 export async function GET(request: Request) {
  try {
   const {searchParams} = new URL(request.url);
@@ -24,7 +26,7 @@ export async function GET(request: Request) {
   const posts = snapshot.docs.map((doc) => ({
    id: doc.id,
    ...doc.data(),
-   createdAt: doc.data().createdAt.toDate(),
+   createdAt: doc.data().createdAt?.toDate().toISOString(), // Konversi ke string
   }));
 
   return NextResponse.json({success: true, data: posts});

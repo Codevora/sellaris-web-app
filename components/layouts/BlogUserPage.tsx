@@ -28,18 +28,19 @@ interface BlogPost {
  excerpt: string;
  content: string;
  category: string;
- createdAt: Date;
+ createdAt: string | Date; // Diubah untuk menerima string atau Date
  author: string;
  tags?: string[];
 }
 
 const getBlogPosts = async (category?: string): Promise<BlogPost[]> => {
  try {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const url = category
-   ? `/api/blog?category=${encodeURIComponent(category)}`
-   : "/api/blog";
+   ? `${baseUrl}/api/blog?category=${encodeURIComponent(category)}`
+   : `${baseUrl}/api/blog`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {next: {revalidate: 60}}); // Revalidate setiap 60 detik
   if (!response.ok) throw new Error("Failed to fetch posts");
 
   const {data} = await response.json();
@@ -52,7 +53,10 @@ const getBlogPosts = async (category?: string): Promise<BlogPost[]> => {
 
 const getAllCategories = async (): Promise<string[]> => {
  try {
-  const response = await fetch("/api/blog/categories");
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  const response = await fetch(`${baseUrl}/api/blog/categories`, {
+   next: {revalidate: 3600},
+  }); // Revalidate setiap jam
   if (!response.ok) throw new Error("Failed to fetch categories");
 
   const {data} = await response.json();
@@ -63,14 +67,38 @@ const getAllCategories = async (): Promise<string[]> => {
  }
 };
 
+// Fungsi helper untuk format tanggal
+const formatDate = (date: string | Date): string => {
+ if (!date) return "";
+ const dateObj = typeof date === "string" ? new Date(date) : date;
+ return dateObj.toLocaleDateString("id-ID", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+ });
+};
+
+const formatShortDate = (date: string | Date): string => {
+ if (!date) return "";
+ const dateObj = typeof date === "string" ? new Date(date) : date;
+ return dateObj.toLocaleDateString("id-ID", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+ });
+};
+
 export default async function BlogUserPage({
  searchParams,
 }: {
  searchParams?: {category?: string};
 }) {
  const category = searchParams?.category;
- const posts = await getBlogPosts(category);
- const categories = await getAllCategories();
+ const [posts, categories] = await Promise.all([
+  getBlogPosts(category),
+  getAllCategories(),
+ ]);
+
  const popularTags = [
   "Retail",
   "F&B",
@@ -169,19 +197,13 @@ export default async function BlogUserPage({
            <MotionDiv
             whileHover={{y: -5}}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all border border-gray-100">
-            <div className="relative h-48 overflow-hidden">
-             {/* Image placeholder */}
+            <div className="relative h-48 overflow-hidden bg-gray-100">
+             {/* Placeholder untuk gambar */}
             </div>
             <div className="p-6">
              <div className="flex items-center text-sm text-gray-500 mb-3">
               <FaCalendarAlt className="mr-2" />
-              <span>
-               {post.createdAt.toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-               })}
-              </span>
+              <span>{formatDate(post.createdAt)}</span>
               <span className="mx-2">•</span>
               <FaUser className="mr-2" />
               <span>{post.author}</span>
@@ -211,29 +233,6 @@ export default async function BlogUserPage({
           </FadeIn>
          ))}
         </StaggerContainer>
-       )}
-
-       {/* Pagination */}
-       {posts.length > 0 && (
-        <div className="mt-12 flex justify-center">
-         <nav className="flex items-center gap-2">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-           Previous
-          </button>
-          <button className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
-           1
-          </button>
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-           2
-          </button>
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-           3
-          </button>
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-           Next
-          </button>
-         </nav>
-        </div>
        )}
       </div>
 
@@ -326,8 +325,8 @@ export default async function BlogUserPage({
            <div
             key={post.id}
             className="flex gap-3">
-            <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden">
-             {/* Image placeholder */}
+            <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
+             {/* Placeholder untuk gambar */}
             </div>
             <div>
              <h4 className="font-medium text-gray-800 text-sm hover:text-teal-500 transition-colors">
@@ -338,11 +337,7 @@ export default async function BlogUserPage({
               </Link>
              </h4>
              <p className="text-xs text-gray-500 mt-1">
-              {post.createdAt.toLocaleDateString("id-ID", {
-               day: "numeric",
-               month: "short",
-               year: "numeric",
-              })}
+              {formatShortDate(post.createdAt)}
              </p>
             </div>
            </div>
