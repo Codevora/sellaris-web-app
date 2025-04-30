@@ -63,20 +63,33 @@ const formatShortDate = (dateString: string) => {
 };
 
 export default async function BlogIdUserPage({params}: {params: {id: string}}) {
+ console.log("Blog ID:", params.id); // Check if ID is received
+
  try {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const response = await fetch(`${baseUrl}/api/blog/${params.id}`, {
-   next: {revalidate: 60}, // ISR: Revalidate setiap 60 detik
+  const apiUrl = `${baseUrl}/api/blog/${params.id}`;
+  console.log("Fetching from:", apiUrl); // Log the URL being fetched
+
+  const response = await fetch(apiUrl, {
+   next: {revalidate: 60},
   });
 
-  if (!response.ok) return notFound();
+  console.log("Response status:", response.status); // Log response status
+
+  if (!response.ok) {
+   console.error("Fetch failed with status:", response.status);
+   return notFound();
+  }
+
+  const result = await response.json();
+  console.log("API Response:", result); // Log the full response
 
   const {data: post} = await response.json();
 
   // Validasi data yang diperlukan
   if (!post.title || !post.content) {
    return notFound();
-  }
+  } 
 
   return (
    <div className="bg-gray-50 min-h-screen">
