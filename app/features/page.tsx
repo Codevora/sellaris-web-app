@@ -222,8 +222,8 @@ const Features = () => {
          <Image
           src={feature.image}
           alt={feature.title}
-          width={600}
-          height={400}
+          width={800}
+          height={600}
           className="w-full h-auto object-cover transition-all duration-500 group-hover:scale-105"
          />
         </div>

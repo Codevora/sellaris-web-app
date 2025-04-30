@@ -35,7 +35,7 @@ export default function AdminDashboardLayout({
    {isMobile && (
     <button
      onClick={() => setSidebarOpen(!sidebarOpen)}
-     className="fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white lg:hidden shadow-lg"
+     className="fixed top-4 left-4 z-50 p-2 rounded-md bg-teal-600 text-white lg:hidden shadow-lg"
      aria-label="Toggle sidebar">
      {sidebarOpen ? (
       <svg

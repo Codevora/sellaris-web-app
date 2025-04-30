@@ -8,12 +8,9 @@ import {
  type SettingsData,
 } from "@/lib/firebase/settingsService";
 
-//components
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
-import WebMasterAppearanceSection from "./WebMasterAppearanceSecton";
 import WebMasterProfileSection from "./WebMasteProfileSection";
-import WebMasterSystemConfigSection from "./WebMasterSystemConfiguration";
 
 export default function WebMasterSettingsPage() {
  const {data: session}: {data: any} = useSession();
@@ -91,7 +88,7 @@ export default function WebMasterSettingsPage() {
 
    {/* Tab Navigation */}
    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-    {["profile", "system", "appearance"].map((tab) => (
+    {["profile"].map((tab) => (
      <button
       key={tab}
       onClick={() => setActiveTab(tab)}
@@ -125,18 +122,6 @@ export default function WebMasterSettingsPage() {
      {activeTab === "profile" && (
       <WebMasterProfileSection
        settings={settings?.profile}
-       onSave={handleSave}
-      />
-     )}
-     {activeTab === "system" && (
-      <WebMasterSystemConfigSection
-       settings={settings?.system}
-       onSave={handleSave}
-      />
-     )}
-     {activeTab === "appearance" && (
-      <WebMasterAppearanceSection
-       settings={settings?.appearance}
        onSave={handleSave}
       />
      )}

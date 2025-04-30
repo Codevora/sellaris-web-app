@@ -32,7 +32,7 @@ const Navbar = () => {
   {name: "Tentang Kami", path: "/about"},
   {name: "Fitur", path: "/features"},
   {name: "Harga", path: "/pricing"},
-  {name: "Blog", path: "/gallery"},
+  {name: "Blog", path: "/blog"},
   {name: "Karir", path: "/career"},
   {name: "Kontak", path: "/contact"},
  ];

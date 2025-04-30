@@ -6,11 +6,13 @@ import {
  getDoc,
  getDocs,
  getFirestore,
+ orderBy,
  query,
  updateDoc,
  where,
+ 
 } from "firebase/firestore";
-import {app} from "./init";
+import {app, db} from "./init";
 import bcrypt from "bcrypt";
 import {sendVerificationEmail} from "./email";
 
@@ -179,3 +181,4 @@ export async function login({email}: {email: string}) {
   verified: data.verified,
  };
 }
+

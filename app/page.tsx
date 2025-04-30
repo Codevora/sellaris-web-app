@@ -41,7 +41,7 @@ const Home = () => {
  return (
   <div className="flex flex-col w-full overflow-x-hidden bg-gray-50">
    {/* Hero Section - 3D Parallax Effect */}
-   <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white overflow-hidden pt-40">
+   <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white overflow-hidden pt-24 xl:pt-40 2xl:pt-0">
     {/* Floating background elements */}
     <div className="absolute inset-0 overflow-hidden">
      <MotionDiv
@@ -434,34 +434,26 @@ const Home = () => {
      <StaggerContainer className="flex flex-col items-center text-center">
       <FadeIn>
        <h1 className="font-raleway font-bold text-4xl md:text-5xl mb-6">
-        Siap <span className="text-amber-300">Mengubah</span> Bisnis Anda?
+        Siap <span className="text-amber-300">Memulai</span>?
        </h1>
        <p className="text-lg text-teal-100 max-w-2xl mx-auto mb-8 leading-relaxed">
         Bergabung dengan ribuan bisnis yang telah mempercayakan operasional
-        mereka kepada Sellaris. Mulai gratis 14 hari tanpa perlu kartu kredit.
+        mereka kepada Sellaris.
        </p>
       </FadeIn>
 
-      <FadeIn className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+      <FadeIn className="flex flex-col sm:flex-row gap-4">
        <MotionButton
         whileHover={{scale: 1.05}}
         whileTap={{scale: 0.95}}
-        className="px-6 py-3 bg-white text-teal-600 font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
-        <Link
-         href="/a"
-         className="flex items-center justify-center gap-2">
-         Coba Gratis Sekarang
-        </Link>
+        className="px-8 py-4 bg-white text-teal-600 font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
+        Coba Gratis 14 Hari
        </MotionButton>
        <MotionButton
         whileHover={{scale: 1.05}}
         whileTap={{scale: 0.95}}
-        className="px-6 py-3 border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-all">
-        <Link
-         href="/a"
-         className="flex items-center justify-center gap-2">
-         Demo Produk
-        </Link>
+        className="px-8 py-4 border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-all">
+        Hubungi Tim Penjualan
        </MotionButton>
       </FadeIn>
      </StaggerContainer>

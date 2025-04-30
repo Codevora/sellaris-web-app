@@ -17,6 +17,7 @@ import {RiShieldKeyholeFill} from "react-icons/ri";
 import {IoIosArrowDropright} from "react-icons/io";
 import {MdDashboard} from "react-icons/md";
 import {useState} from "react";
+import { FaPencil } from "react-icons/fa6";
 
 interface WebMasterSidebarProps {
  isMobile: boolean;
@@ -57,6 +58,11 @@ const webmasterLinks = [
   name: "Analytics",
   path: "/admin/webmaster/analytics",
   icon: <FaChartLine />,
+ },
+ {
+  name: "Blog",
+  path: "/admin/webmaster/blog",
+  icon: <FaPencil />,
  },
  {
   name: "Payment Methods",
