@@ -1,4 +1,6 @@
-import {Metadata} from "next";
+"use client";
+
+import {useEffect, useState} from "react";
 import {
  FaCalendarAlt,
  FaTags,
@@ -7,7 +9,6 @@ import {
  FaArrowLeft,
 } from "react-icons/fa";
 import Link from "next/link";
-import {notFound} from "next/navigation";
 import {
  FadeIn,
  StaggerContainer,
@@ -16,58 +17,17 @@ import {
 } from "@/components/AnimatedComponent";
 import {FaArrowRightLong} from "react-icons/fa6";
 
-export const metadata: Metadata = {
- title: "Sellaris Blog - Insights for Your Business Growth",
- description:
-  "Learn about business strategies, technology trends, and productivity tips",
-};
-
 interface BlogPost {
  id: string;
  title: string;
  excerpt: string;
  content: string;
  category: string;
- createdAt: string | Date; // Diubah untuk menerima string atau Date
+ createdAt: string | Date;
  author: string;
  tags?: string[];
 }
 
-const getBlogPosts = async (category?: string): Promise<BlogPost[]> => {
- try {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  const url = category
-   ? `${baseUrl}/api/blog?category=${encodeURIComponent(category)}`
-   : `${baseUrl}/api/blog`;
-
-  const response = await fetch(url, {next: {revalidate: 60}}); // Revalidate setiap 60 detik
-  if (!response.ok) throw new Error("Failed to fetch posts");
-
-  const {data} = await response.json();
-  return data;
- } catch (error) {
-  console.error("Error fetching blog posts:", error);
-  return [];
- }
-};
-
-const getAllCategories = async (): Promise<string[]> => {
- try {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  const response = await fetch(`${baseUrl}/api/blog/categories`, {
-   next: {revalidate: 3600},
-  }); // Revalidate setiap jam
-  if (!response.ok) throw new Error("Failed to fetch categories");
-
-  const {data} = await response.json();
-  return data;
- } catch (error) {
-  console.error("Error fetching categories:", error);
-  return [];
- }
-};
-
-// Fungsi helper untuk format tanggal
 const formatDate = (date: string | Date): string => {
  if (!date) return "";
  const dateObj = typeof date === "string" ? new Date(date) : date;
@@ -88,17 +48,17 @@ const formatShortDate = (date: string | Date): string => {
  });
 };
 
-export default async function BlogUserPage({
+export default function BlogUserPage({
  searchParams,
 }: {
  searchParams?: {category?: string};
 }) {
- const category = searchParams?.category;
- const [posts, categories] = await Promise.all([
-  getBlogPosts(category),
-  getAllCategories(),
- ]);
+ const [posts, setPosts] = useState<BlogPost[]>([]);
+ const [categories, setCategories] = useState<string[]>([]);
+ const [loading, setLoading] = useState(true);
+ const [error, setError] = useState<string | null>(null);
 
+ const category = searchParams?.category;
  const popularTags = [
   "Retail",
   "F&B",
@@ -108,8 +68,60 @@ export default async function BlogUserPage({
   "Finance",
  ];
 
- if (category && posts.length === 0) {
-  return notFound();
+ useEffect(() => {
+  const fetchData = async () => {
+   try {
+    setLoading(true);
+    setError(null);
+
+    // Fetch posts
+    const postsUrl = category
+     ? `/api/blog?category=${encodeURIComponent(category)}`
+     : "/api/blog";
+
+    const postsRes = await fetch(postsUrl);
+    if (!postsRes.ok) throw new Error("Failed to fetch posts");
+    const postsData = await postsRes.json();
+
+    // Fetch categories
+    const categoriesRes = await fetch("/api/blog/categories");
+    if (!categoriesRes.ok) throw new Error("Failed to fetch categories");
+    const categoriesData = await categoriesRes.json();
+
+    setPosts(postsData.data);
+    setCategories(categoriesData.data);
+   } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err instanceof Error ? err.message : "Failed to load data");
+   } finally {
+    setLoading(false);
+   }
+  };
+
+  fetchData();
+ }, [category]);
+
+ if (loading) {
+  return (
+   <div className="flex justify-center items-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+   </div>
+  );
+ }
+
+ if (error) {
+  return (
+   <div className="flex justify-center items-center min-h-screen">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+     <p>Error: {error}</p>
+     <button
+      onClick={() => window.location.reload()}
+      className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+      Try Again
+     </button>
+    </div>
+   </div>
+  );
  }
 
  return (
@@ -182,13 +194,17 @@ export default async function BlogUserPage({
        {posts.length === 0 ? (
         <div className="text-center py-12">
          <h3 className="text-xl font-medium text-gray-600 mb-4">
-          Tidak ada artikel yang ditemukan
+          {category
+           ? `Tidak ada artikel ditemukan dalam kategori ${category}`
+           : "Belum ada artikel tersedia"}
          </h3>
-         <Link
-          href="/blog"
-          className="inline-flex items-center px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
-          Lihat semua artikel
-         </Link>
+         {category && (
+          <Link
+           href="/blog"
+           className="inline-flex items-center px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
+           Lihat semua artikel
+          </Link>
+         )}
         </div>
        ) : (
         <StaggerContainer className="grid md:grid-cols-2 gap-8">
@@ -198,7 +214,7 @@ export default async function BlogUserPage({
             whileHover={{y: -5}}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all border border-gray-100">
             <div className="relative h-48 overflow-hidden bg-gray-100">
-             {/* Placeholder untuk gambar */}
+             {/* Placeholder for image */}
             </div>
             <div className="p-6">
              <div className="flex items-center text-sm text-gray-500 mb-3">
@@ -326,7 +342,7 @@ export default async function BlogUserPage({
             key={post.id}
             className="flex gap-3">
             <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
-             {/* Placeholder untuk gambar */}
+             {/* Placeholder for image */}
             </div>
             <div>
              <h4 className="font-medium text-gray-800 text-sm hover:text-teal-500 transition-colors">
