@@ -41,7 +41,7 @@ const Home = () => {
  return (
   <div className="flex flex-col w-full overflow-x-hidden bg-gray-50">
    {/* Hero Section - 3D Parallax Effect */}
-   <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white overflow-hidden">
+   <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white overflow-hidden pt-40">
     {/* Floating background elements */}
     <div className="absolute inset-0 overflow-hidden">
      <MotionDiv

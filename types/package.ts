@@ -7,12 +7,6 @@ export interface Package {
  duration: number; // in years
  features: string[];
  isFeatured: boolean;
- colorScheme: {
-  // Remove the ? to make it required
-  primary: string;
-  secondary: string;
-  text: string;
- };
  createdAt?: Date;
  updatedAt?: Date;
 }

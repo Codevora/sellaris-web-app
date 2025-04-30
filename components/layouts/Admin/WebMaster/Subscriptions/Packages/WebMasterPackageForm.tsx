@@ -3,7 +3,6 @@
 import {useState, useEffect} from "react";
 import {motion} from "framer-motion";
 import {FiX, FiCheck} from "react-icons/fi";
-import {HexColorPicker} from "react-colorful";
 import {Package} from "@/types/package";
 
 interface PackageFormProps {
@@ -11,12 +10,6 @@ interface PackageFormProps {
  onClose: () => void;
  onSubmit: () => void;
 }
-
-const DEFAULT_COLOR_SCHEME = {
- primary: "#3b82f6",
- secondary: "#bfdbfe",
- text: "#1e3a8a",
-};
 
 const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
  const [formData, setFormData] = useState<Omit<Package, "id">>({
@@ -26,13 +19,9 @@ const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
   duration: 1,
   features: [""],
   isFeatured: false,
-  colorScheme: DEFAULT_COLOR_SCHEME,
  });
 
  const [featureInput, setFeatureInput] = useState("");
- const [activeColorPicker, setActiveColorPicker] = useState<
-  "primary" | "secondary" | "text" | null
- >(null);
 
  useEffect(() => {
   if (pkg) {
@@ -43,7 +32,6 @@ const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
     duration: pkg.duration,
     features: pkg.features,
     isFeatured: pkg.isFeatured,
-    colorScheme: pkg.colorScheme || DEFAULT_COLOR_SCHEME,
    });
   }
  }, [pkg]);
@@ -63,19 +51,6 @@ const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
   setFormData((prev) => ({
    ...prev,
    [name]: name === "duration" ? parseInt(value) || 1 : parseFloat(value) || 0,
-  }));
- };
-
- const handleColorChange = (
-  color: string,
-  type: "primary" | "secondary" | "text"
- ) => {
-  setFormData((prev) => ({
-   ...prev,
-   colorScheme: {
-    ...prev.colorScheme,
-    [type]: color,
-   },
   }));
  };
 
@@ -204,80 +179,6 @@ const WebMasterPackageForm = ({pkg, onClose, onSubmit}: PackageFormProps) => {
           required
          />
         </div>
-       </div>
-
-       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-         Color Scheme
-        </label>
-        <div className="grid grid-cols-3 gap-4">
-         <div>
-          <label className="block text-xs text-gray-500 mb-1">
-           Primary Color
-          </label>
-          <div className="flex items-center gap-2">
-           <div
-            className="w-8 h-8 rounded-md cursor-pointer border border-gray-300"
-            style={{backgroundColor: formData.colorScheme.primary}}
-            onClick={() =>
-             setActiveColorPicker(
-              activeColorPicker === "primary" ? null : "primary"
-             )
-            }
-           />
-           <span className="text-sm">{formData.colorScheme.primary}</span>
-          </div>
-         </div>
-
-         <div>
-          <label className="block text-xs text-gray-500 mb-1">
-           Secondary Color
-          </label>
-          <div className="flex items-center gap-2">
-           <div
-            className="w-8 h-8 rounded-md cursor-pointer border border-gray-300"
-            style={{backgroundColor: formData.colorScheme.secondary}}
-            onClick={() =>
-             setActiveColorPicker(
-              activeColorPicker === "secondary" ? null : "secondary"
-             )
-            }
-           />
-           <span className="text-sm">{formData.colorScheme.secondary}</span>
-          </div>
-         </div>
-
-         <div>
-          <label className="block text-xs text-gray-500 mb-1">Text Color</label>
-          <div className="flex items-center gap-2">
-           <div
-            className="w-8 h-8 rounded-md cursor-pointer border border-gray-300"
-            style={{backgroundColor: formData.colorScheme.text}}
-            onClick={() =>
-             setActiveColorPicker(activeColorPicker === "text" ? null : "text")
-            }
-           />
-           <span className="text-sm">{formData.colorScheme.text}</span>
-          </div>
-         </div>
-        </div>
-
-        {activeColorPicker && (
-         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <HexColorPicker
-           color={formData.colorScheme[activeColorPicker]}
-           onChange={(color) => handleColorChange(color, activeColorPicker)}
-          />
-          <div className="mt-2 flex justify-end">
-           <button
-            type="button"
-            onClick={() => setActiveColorPicker(null)}
-            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md">
-            Close Picker
-           </button>
-          </div>
-         </div>
-        )}
        </div>
 
        <div>

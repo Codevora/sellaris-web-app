@@ -6,6 +6,7 @@ import {usePathname} from "next/navigation";
 import {SessionProvider} from "next-auth/react";
 import {ThemeProvider} from "next-themes";
 import I18nClientProvider from "@/components/I18nClientProvider";
+import Footer from "@/components/layouts/Footer";
 
 const geistSans = Geist({
  variable: "--font-geist-sans",
@@ -23,8 +24,26 @@ export default function RootLayout({
  children: React.ReactNode;
 }>) {
  const pathname = usePathname();
- const disableNavbar = ["/login", "/register", "/admin", "/pricing/checkout", "/unauthorized"];
+ const disableNavbar = [
+  "/login",
+  "/register",
+  "/admin",
+  "/pricing/checkout",
+  "/unauthorized",
+ ];
+
+ const disableFooter = [
+  "/login",
+  "/register",
+  "/admin",
+  "/pricing/checkout",
+  "/unauthorized",
+ ];
  const showNavbar = !disableNavbar.some(
+  (path) => pathname === path || pathname.startsWith(`${path}/`)
+ );
+
+ const showFooter = !disableFooter.some(
   (path) => pathname === path || pathname.startsWith(`${path}/`)
  );
 
@@ -41,6 +60,7 @@ export default function RootLayout({
       <I18nClientProvider>
        {showNavbar && <Navbar />}
        <main>{children}</main>
+       {showFooter && <Footer />}
       </I18nClientProvider>
      </ThemeProvider>
     </body>

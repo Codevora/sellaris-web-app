@@ -17,11 +17,24 @@ const Navbar = () => {
   return () => window.removeEventListener("scroll", handleScroll);
  }, []);
 
+ // Tutup mobile menu ketika scroll
+ useEffect(() => {
+  const handleScroll = () => {
+   if (mobileOpen) {
+    setMobileOpen(false);
+   }
+  };
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+ }, [mobileOpen]);
+
  const navItems = [
-  {name: "Discover", path: "/discover"},
-  {name: "Gallery", path: "/gallery"},
-  {name: "Pricing", path: "/pricing"},
-  {name: "About", path: "/about"},
+  {name: "Tentang Kami", path: "/about"},
+  {name: "Fitur", path: "/features"},
+  {name: "Harga", path: "/pricing"},
+  {name: "Blog", path: "/gallery"},
+  {name: "Karir", path: "/career"},
+  {name: "Kontak", path: "/contact"},
  ];
 
  return (
@@ -29,10 +42,10 @@ const Navbar = () => {
    initial={{y: -100}}
    animate={{y: 0}}
    transition={{type: "spring", stiffness: 100}}
-   className={`fixed w-full z-50 transition-all duration-300 ${
+   className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
     scrolled
-     ? "bg-gradient-to-br from-teal-600 to-teal-700 backdrop-blur-md py-3 2xl:py-5"
-     : "bg-gradient-to-br from-teal-600 to-teal-700 py-4 2xl:py-6"
+     ? "bg-gradient-to-br from-teal-600 to-teal-700 backdrop-blur-md py-4 2xl:py-5"
+     : "bg-gradient-to-br from-teal-600 to-teal-700 py-5 2xl:py-6"
    }`}>
    <div className="container mx-auto px-4">
     <div className="flex justify-between items-center">
@@ -83,7 +96,7 @@ const Navbar = () => {
      </button>
     </div>
 
-    {/* Mobile Menu */}
+    {/* Mobile Menu - Solusi Fixed */}
     <AnimatePresence>
      {mobileOpen && (
       <motion.div
@@ -91,13 +104,18 @@ const Navbar = () => {
        animate={{opacity: 1, y: 0}}
        exit={{opacity: 0, y: -20}}
        transition={{duration: 0.3}}
-       className="md:hidden fixed inset-0 bg-primary/95 backdrop-blur-lg pt-20 px-6 z-40">
-       <div className="flex flex-col space-y-6">
+       className="md:hidden fixed inset-0 bg-teal-700 pt-20 px-6 z-40 h-screen overflow-y-auto"
+       style={{
+        background: "linear-gradient(to bottom right, #0d9488, #0e7490)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+       }}>
+       <div className="flex flex-col space-y-6 pb-8">
         {navItems.map((item) => (
          <Link
           key={item.path}
           href={item.path}
-          className="text-white text-2xl font-medium py-3 border-b border-white/10"
+          className="text-white text-2xl font-medium py-3 border-b border-white/10 hover:text-teal-100 transition-colors"
           onClick={() => setMobileOpen(false)}>
           {item.name}
          </Link>

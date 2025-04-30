@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import WebMasterSidebar from "@/components/layouts/Admin/WebMaster/WebMasterSidebar";
+import AdminSidebar from "@/components/layouts/Admin/AdminSidebar";
 import {useEffect, useState} from "react";
 
-export default function WebmasterDashboardLayout({
+export default function AdminDashboardLayout({
  children,
 }: {
  children: React.ReactNode;
@@ -18,6 +18,8 @@ export default function WebmasterDashboardLayout({
    // On desktop, always keep sidebar open
    if (!mobile) {
     setSidebarOpen(true);
+   } else {
+    setSidebarOpen(false);
    }
   };
 
@@ -33,7 +35,8 @@ export default function WebmasterDashboardLayout({
    {isMobile && (
     <button
      onClick={() => setSidebarOpen(!sidebarOpen)}
-     className="fixed top-4 left-4 z-50 p-2 rounded-md bg-teal-600 text-white lg:hidden">
+     className="fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white lg:hidden shadow-lg"
+     aria-label="Toggle sidebar">
      {sidebarOpen ? (
       <svg
        xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +69,7 @@ export default function WebmasterDashboardLayout({
     </button>
    )}
 
-   <WebMasterSidebar
+   <AdminSidebar
     isMobile={isMobile}
     sidebarOpen={sidebarOpen}
     setSidebarOpen={setSidebarOpen}
@@ -74,11 +77,13 @@ export default function WebmasterDashboardLayout({
 
    <main
     className={`
-          flex-1 p-4 md:p-6 transition-all duration-300
+          flex-1 p-4 md:p-6 transition-all duration-300 min-h-screen
           ${sidebarOpen && isMobile ? "ml-0" : ""}
           ${!isMobile ? "ml-[280px]" : ""}
         `}>
-    {children}
+    <div className="max-w-full overflow-x-auto bg-white rounded-lg shadow-sm p-4 md:p-6">
+     {children}
+    </div>
    </main>
   </div>
  );
