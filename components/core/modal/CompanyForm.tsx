@@ -2,7 +2,6 @@
 import {motion} from "framer-motion";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
-import {signIn} from "next-auth/react";
 
 const containerVariants = {
  hidden: {opacity: 0, y: 20},
@@ -22,6 +21,7 @@ const itemVariants = {
 };
 
 interface CompanyFormProps {
+ userId: string;
  initialData: {
   fullname: string;
   email: string;
@@ -31,7 +31,7 @@ interface CompanyFormProps {
  onSkip: () => void;
 }
 
-export function CompanyForm({initialData, onSkip}: CompanyFormProps) {
+export function CompanyForm({userId, initialData, onSkip}: CompanyFormProps) {
  const [formData, setFormData] = useState({
   companyName: "",
   companyEmail: "",
@@ -51,56 +51,54 @@ export function CompanyForm({initialData, onSkip}: CompanyFormProps) {
   setFormData((prev) => ({...prev, [name]: value}));
  };
 
-const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- setIsLoading(true);
- setError("");
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
- try {
-  // Kirim data perusahaan ke API
-  const response = await fetch("/api/auth/company", {
-   method: "POST",
-   headers: {
-    "Content-Type": "application/json",
-   },
-   body: JSON.stringify(formData),
-  });
+  try {
+   // Kirim data perusahaan ke API
+   const response = await fetch("/api/auth/update-user", {
+    method: "POST",
+    headers: {
+     "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+     userId,
+     companyData: {
+      name: formData.companyName,
+      email: formData.companyEmail,
+      phone: formData.companyPhone,
+      address: formData.companyAddress,
+      industry: formData.companyIndustry,
+      size: formData.companySize,
+     },
+    }),
+   });
 
-  if (!response.ok) {
-   throw new Error("Failed to save company information");
+   if (!response.ok) {
+    throw new Error("Failed to save company information");
+   }
+
+   // Redirect ke dashboard setelah berhasil
+   router.push("/dashboard");
+  } catch (error: any) {
+   setError(error.message || "Failed to save company information");
+  } finally {
+   setIsLoading(false);
   }
+ };
 
-  // Redirect ke dashboard setelah berhasil menyimpan
-  router.push("/dashboard");
- } catch (error: any) {
-  setError(error.message || "Failed to save company information");
- } finally {
-  setIsLoading(false);
- }
-};
-
-const handleSkip = async () => {
- setIsLoading(true);
- try {
-  router.push("/dashboard"); // Langsung redirect karena sudah login
- } catch (error: any) {
-  setError(error.message || "Failed to proceed");
- } finally {
-  setIsLoading(false);
- }
-};
-
- const handleAutoLogin = async () => {
-  const result = await signIn("credentials", {
-   email: initialData.email,
-   redirect: false,
-  });
-
-  if (result?.error) {
-   throw new Error(result.error);
+ const handleSkip = async () => {
+  setIsLoading(true);
+  try {
+   // Langsung redirect ke dashboard
+   router.push("/dashboard");
+  } catch (error: any) {
+   setError(error.message || "Failed to proceed");
+  } finally {
+   setIsLoading(false);
   }
-
-  router.push("/admin/dashboard");
  };
 
  const isFormValid = () => {
@@ -145,6 +143,7 @@ const handleSkip = async () => {
        onChange={handleChange}
        placeholder="Nama Perusahaan"
        className="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+       required
       />
      </motion.div>
 
@@ -161,6 +160,7 @@ const handleSkip = async () => {
        onChange={handleChange}
        placeholder="Email Perusahaan"
        className="w-full p-3 border border-gray-300 rounded-lg"
+       required
       />
      </motion.div>
 
@@ -177,6 +177,7 @@ const handleSkip = async () => {
        onChange={handleChange}
        placeholder="Telepon Perusahaan"
        className="w-full p-3 border border-gray-300 rounded-lg"
+       required
       />
      </motion.div>
 
@@ -193,6 +194,7 @@ const handleSkip = async () => {
        onChange={handleChange}
        placeholder="Alamat Perusahaan"
        className="w-full p-3 border border-gray-300 rounded-lg"
+       required
       />
      </motion.div>
 
@@ -239,7 +241,11 @@ const handleSkip = async () => {
       </select>
      </motion.div>
 
-     {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+     {error && (
+      <motion.div variants={itemVariants}>
+       <div className="text-red-500 text-sm text-center">{error}</div>
+      </motion.div>
+     )}
 
      <motion.div
       variants={itemVariants}
@@ -257,7 +263,7 @@ const handleSkip = async () => {
        className={`flex-1 bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 ${
         isLoading || !isFormValid() ? "opacity-75 cursor-not-allowed" : ""
        }`}>
-       {isLoading ? "Memproses..." : "Lanjutkan"}
+       {isLoading ? "Memproses..." : "Simpan"}
       </button>
      </motion.div>
     </motion.form>

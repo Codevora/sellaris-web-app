@@ -81,7 +81,7 @@ export default function AdminDashboardLayout({
           ${sidebarOpen && isMobile ? "ml-0" : ""}
           ${!isMobile ? "ml-[280px]" : ""}
         `}>
-    <div className="max-w-full overflow-x-auto bg-white rounded-lg shadow-sm p-4 md:p-6">
+    <div className="max-w-full overflow-x-auto">
      {children}
     </div>
    </main>

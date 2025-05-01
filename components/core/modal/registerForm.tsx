@@ -6,6 +6,10 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import { CompanyForm } from "./CompanyForm";
 
+const itemVariants = {
+ hidden: {opacity: 0, y: 10},
+ visible: {opacity: 1, y: 0},
+};
 const containerVariants = {
  hidden: {opacity: 0, y: 20},
  visible: {
@@ -18,99 +22,90 @@ const containerVariants = {
  },
 };
 
-const itemVariants = {
- hidden: {opacity: 0, y: 10},
- visible: {opacity: 1, y: 0},
-};
-
 export default function RegisterForm() {
-const [error, setError] = useState("");
-const [isLoading, setIsLoading] = useState(false);
-const [email, setEmail] = useState("");
-const [showOtp, setShowOtp] = useState(false);
-const [showCompanyForm, setShowCompanyForm] = useState(false);
-const [formData, setFormData] = useState({
- fullname: "",
- email: "",
- phone: "",
- password: "",
-});
-const [acceptedTerms, setAcceptedTerms] = useState(false);
-const router = useRouter();
+ const [error, setError] = useState("");
+ const [isLoading, setIsLoading] = useState(false);
+ const [email, setEmail] = useState("");
+ const [showOtp, setShowOtp] = useState(false);
+ const [showCompanyForm, setShowCompanyForm] = useState(false);
+ const [userId, setUserId] = useState(""); // Tambahkan state untuk userId
+ const [formData, setFormData] = useState({
+  fullname: "",
+  email: "",
+  phone: "",
+  password: "",
+ });
+ const [acceptedTerms, setAcceptedTerms] = useState(false);
+ const router = useRouter();
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
- e.preventDefault();
- setError("");
- setIsLoading(true);
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
- const formData = new FormData(e.currentTarget);
- const data = {
-  fullname: formData.get("fullname") as string,
-  email: formData.get("email") as string,
-  phone: formData.get("phone") as string,
-  password: formData.get("password") as string,
- };
+  const formData = new FormData(e.currentTarget);
+  const data = {
+   fullname: formData.get("fullname") as string,
+   email: formData.get("email") as string,
+   phone: formData.get("phone") as string,
+   password: formData.get("password") as string,
+  };
 
- if (!data.email || !data.password) {
-  setError("Email and password are required");
-  setIsLoading(false);
-  return;
- }
-
- if (!acceptedTerms) {
-  setError("You must accept the terms and conditions");
-  setIsLoading(false);
-  return;
- }
-
- try {
-  const res = await fetch("/api/auth/register", {
-   method: "POST",
-   headers: {
-    "Content-Type": "application/json",
-   },
-   body: JSON.stringify(data),
-  });
-
-  const result = await res.json();
-
-  if (!res.ok) {
-   throw new Error(result.message || "Registration failed");
+  if (!data.email || !data.password) {
+   setError("Email and password are required");
+   setIsLoading(false);
+   return;
   }
 
-  setEmail(data.email);
-  setFormData(data);
-  setShowOtp(true);
- } catch (error: any) {
-  setError(error.message);
- } finally {
-  setIsLoading(false);
+  try {
+   const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: {
+     "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+   });
+
+   const result = await res.json();
+
+   if (!res.ok) {
+    throw new Error(result.message || "Registration failed");
+   }
+
+   setEmail(data.email);
+   setUserId(result.userId); // Simpan userId dari response
+   setFormData(data);
+   setShowOtp(true);
+  } catch (error: any) {
+   setError(error.message);
+  } finally {
+   setIsLoading(false);
+  }
+ };
+
+ const handleOTPVerificationSuccess = () => {
+  setShowOtp(false);
+  setShowCompanyForm(true);
+ };
+
+ if (showOtp) {
+  return (
+   <OTPVerification
+    email={email}
+    onVerificationSuccess={handleOTPVerificationSuccess}
+   />
+  );
  }
-};
 
-const handleOTPVerificationSuccess = () => {
- setShowOtp(false);
- setShowCompanyForm(true);
-};
-
-if (showOtp) {
- return (
-  <OTPVerification
-   email={email}
-   onVerificationSuccess={handleOTPVerificationSuccess}
-  />
- );
-}
-
-if (showCompanyForm) {
- return (
-  <CompanyForm
-   initialData={formData}
-   onSkip={() => router.push("/dashboard")}
-  />
- );
-}
-
+ if (showCompanyForm) {
+  return (
+   <CompanyForm
+    userId={userId} // Kirim userId ke CompanyForm
+    initialData={formData}
+    onSkip={() => router.push("/dashboard")}
+   />
+  );
+ }
 
  return (
   <motion.div
