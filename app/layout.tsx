@@ -4,8 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/layouts/Navbar";
 import {usePathname} from "next/navigation";
 import {SessionProvider} from "next-auth/react";
-import {ThemeProvider} from "next-themes";
-import I18nClientProvider from "@/components/I18nClientProvider";
 import Footer from "@/components/layouts/Footer";
 
 const geistSans = Geist({
@@ -53,16 +51,9 @@ export default function RootLayout({
    suppressHydrationWarning>
    <SessionProvider>
     <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-     <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem>
-      <I18nClientProvider>
-       {showNavbar && <Navbar />}
-       <main>{children}</main>
-       {showFooter && <Footer />}
-      </I18nClientProvider>
-     </ThemeProvider>
+      {showNavbar && <Navbar />}
+      <main>{children}</main>
+      {showFooter && <Footer />}
     </body>
    </SessionProvider>
   </html>
