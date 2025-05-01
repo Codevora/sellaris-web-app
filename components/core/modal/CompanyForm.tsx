@@ -51,32 +51,44 @@ export function CompanyForm({initialData, onSkip}: CompanyFormProps) {
   setFormData((prev) => ({...prev, [name]: value}));
  };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
+const handleSubmit = async (e: React.FormEvent) => {
+ e.preventDefault();
+ setIsLoading(true);
+ setError("");
 
-  try {
-   // Here you would typically send the company data to your API
-   // For now, we'll just proceed with auto-login
-   await handleAutoLogin();
-  } catch (error: any) {
-   setError(error.message || "Failed to save company information");
-  } finally {
-   setIsLoading(false);
-  }
- };
+ try {
+  // Kirim data perusahaan ke API
+  const response = await fetch("/api/auth/company", {
+   method: "POST",
+   headers: {
+    "Content-Type": "application/json",
+   },
+   body: JSON.stringify(formData),
+  });
 
- const handleSkip = async () => {
-  setIsLoading(true);
-  try {
-   await handleAutoLogin();
-  } catch (error: any) {
-   setError(error.message || "Failed to proceed");
-  } finally {
-   setIsLoading(false);
+  if (!response.ok) {
+   throw new Error("Failed to save company information");
   }
- };
+
+  // Redirect ke dashboard setelah berhasil menyimpan
+  router.push("/dashboard");
+ } catch (error: any) {
+  setError(error.message || "Failed to save company information");
+ } finally {
+  setIsLoading(false);
+ }
+};
+
+const handleSkip = async () => {
+ setIsLoading(true);
+ try {
+  router.push("/dashboard"); // Langsung redirect karena sudah login
+ } catch (error: any) {
+  setError(error.message || "Failed to proceed");
+ } finally {
+  setIsLoading(false);
+ }
+};
 
  const handleAutoLogin = async () => {
   const result = await signIn("credentials", {

@@ -111,7 +111,7 @@ const handleSubmit = async () => {
    throw new Error(data.message || "Verification failed");
   }
 
-  // Auto-login after verification
+  // Auto-login setelah verifikasi berhasil
   const signInResponse = await signIn("credentials", {
    email,
    redirect: false,
@@ -121,10 +121,8 @@ const handleSubmit = async () => {
    throw new Error(signInResponse.error);
   }
 
-  // Redirect based on role (if available in response)
-  const redirectPath =
-   data.user?.role === "admin" ? "/admin/webmaster" : "/admin/dashboard";
-  router.push(redirectPath);
+  // Lanjut ke Company Form
+  onVerificationSuccess();
  } catch (err) {
   const error = err as Error;
   setError(error.message);
