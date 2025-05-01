@@ -1,31 +1,39 @@
-import {NextResponse} from "next/server";
-import {getDoc, doc} from "firebase/firestore";
 import {db} from "@/lib/firebase/init";
+import {deleteDoc, doc, updateDoc} from "firebase/firestore";
+import {NextResponse} from "next/server";
 
-export async function GET(request: Request, {params}: {params: {id: string}}) {
+export async function PUT(request: Request, {params}: {params: {id: string}}) {
  try {
-  const docRef = doc(db, "blogPosts", params.id);
-  const docSnap = await getDoc(docRef);
+  const body = await request.json();
+  const postRef = doc(db, "blogPosts", params.id);
+  await updateDoc(postRef, body);
 
-  if (!docSnap.exists()) {
-   return NextResponse.json(
-    {success: false, message: "Post not found"},
-    {status: 404}
-   );
-  }
-
-  const post = {
-   id: docSnap.id,
-   ...docSnap.data(),
-   // Convert Firestore Timestamp to ISO string
-   createdAt: docSnap.data().createdAt?.toDate().toISOString(),
-  };
-
-  return NextResponse.json({success: true, data: post});
- } catch (error) {
-  console.error("Error fetching post:", error);
   return NextResponse.json(
-   {success: false, message: "Failed to fetch post"},
+   {message: "Blog post updated successfully"},
+   {status: 200}
+  );
+ } catch (error) {
+  return NextResponse.json(
+   {error: "Failed to update blog post"},
+   {status: 500}
+  );
+ }
+}
+
+export async function DELETE(
+ request: Request,
+ {params}: {params: {id: string}}
+) {
+ try {
+  await deleteDoc(doc(db, "blogPosts", params.id));
+
+  return NextResponse.json(
+   {message: "Blog post deleted successfully"},
+   {status: 200}
+  );
+ } catch (error) {
+  return NextResponse.json(
+   {error: "Failed to delete blog post"},
    {status: 500}
   );
  }

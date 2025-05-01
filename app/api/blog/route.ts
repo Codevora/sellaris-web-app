@@ -1,46 +1,40 @@
-import {NextResponse} from "next/server";
-import {getDocs, collection, query, orderBy, where} from "firebase/firestore";
 import {db} from "@/lib/firebase/init";
+import {getDocs, collection, addDoc} from "firebase/firestore";
+import {NextResponse} from "next/server";
 
-export const dynamic = "force-dynamic"; // Pastikan ini ada
-
-export async function GET(request: Request) {
+export async function GET() {
  try {
-  console.log("API Blog Endpoint Hit"); // Log ketika endpoint diakses
-
-  const {searchParams} = new URL(request.url);
-  const category = searchParams.get("category");
-
-  const postsRef = collection(db, "blogPosts");
-  let q;
-
-  if (category) {
-   q = query(
-    postsRef,
-    where("category", "==", category),
-    orderBy("createdAt", "desc")
-   );
-  } else {
-   q = query(postsRef, orderBy("createdAt", "desc"));
-  }
-
-  const snapshot = await getDocs(q);
-  const posts = snapshot.docs.map((doc) => ({
+  const querySnapshot = await getDocs(collection(db, "blogPosts"));
+  const posts = querySnapshot.docs.map((doc) => ({
    id: doc.id,
    ...doc.data(),
-   createdAt: doc.data().createdAt?.toDate().toISOString(),
+   createdAt: doc.data().createdAt.toDate().toISOString(),
   }));
 
-  console.log("Posts fetched from Firestore:", posts.length); // Log jumlah post
-
-  return NextResponse.json({
-   success: true,
-   data: posts,
-  });
+  return NextResponse.json(posts, {status: 200});
  } catch (error) {
-  console.error("API Error:", error);
   return NextResponse.json(
-   {success: false, message: "Failed to fetch posts"},
+   {error: "Failed to fetch blog posts"},
+   {status: 500}
+  );
+ }
+}
+
+export async function POST(request: Request) {
+ try {
+  const body = await request.json();
+  const docRef = await addDoc(collection(db, "blogPosts"), {
+   ...body,
+   createdAt: new Date(),
+  });
+
+  return NextResponse.json(
+   {id: docRef.id, message: "Blog post created successfully"},
+   {status: 201}
+  );
+ } catch (error) {
+  return NextResponse.json(
+   {error: "Failed to create blog post"},
    {status: 500}
   );
  }
