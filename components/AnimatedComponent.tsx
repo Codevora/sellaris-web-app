@@ -1,42 +1,58 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import {motion, Variants} from "framer-motion";
+
+export const FadeIn = ({
+ children,
+ className = "",
+ delay = 0,
+ duration = 0.5,
+}: {
+ children: React.ReactNode;
+ className?: string;
+ delay?: number;
+ duration?: number;
+}) => {
+ return (
+  <motion.div
+   initial={{opacity: 0, y: 20}}
+   animate={{opacity: 1, y: 0}}
+   transition={{duration, delay}}
+   className={className}>
+   {children}
+  </motion.div>
+ );
+};
+
+export const StaggerContainer = ({
+ children,
+ className = "",
+ staggerChildren = 0.1,
+}: {
+ children: React.ReactNode;
+ className?: string;
+ staggerChildren?: number;
+}) => {
+ const containerVariants: Variants = {
+  hidden: {opacity: 0},
+  show: {
+   opacity: 1,
+   transition: {
+    staggerChildren: staggerChildren,
+   },
+  },
+ };
+
+ return (
+  <motion.div
+   variants={containerVariants}
+   initial="hidden"
+   animate="show"
+   className={className}>
+   {children}
+  </motion.div>
+ );
+};
 
 export const MotionDiv = motion.div;
-export const MotionH1 = motion.h1;
-export const MotionP = motion.p;
 export const MotionButton = motion.button;
-
-export const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
-
-export const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-export const FadeIn = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-  <MotionDiv
-    variants={fadeIn}
-    className={className}
-  >
-    {children}
-  </MotionDiv>
-);
-
-export const StaggerContainer = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-  <MotionDiv
-    variants={staggerContainer}
-    initial="hidden"
-    animate="visible"
-    className={className}
-  >
-    {children}
-  </MotionDiv>
-);
