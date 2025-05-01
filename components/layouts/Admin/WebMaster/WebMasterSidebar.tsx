@@ -17,7 +17,7 @@ import {RiShieldKeyholeFill} from "react-icons/ri";
 import {IoIosArrowDropright} from "react-icons/io";
 import {MdDashboard} from "react-icons/md";
 import {useState} from "react";
-import { FaPencil } from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 
 interface WebMasterSidebarProps {
  isMobile: boolean;
@@ -135,10 +135,10 @@ export default function WebMasterSidebar({
       className={`fixed left-0 top-0 h-full w-[280px] bg-gradient-to-br from-teal-600 to-teal-700 text-white p-5 flex flex-col rounded-r-xl shadow-xl z-40 ${
        isMobile && !sidebarOpen ? "hidden" : ""
       }`}>
-      {/* Main content container */}
+      {/* Main content container with scroll */}
       <div className="flex flex-col w-full h-full">
-       {/* Header and menu items */}
-       <div className="flex-1 overflow-hidden">
+       {/* Scrollable menu area */}
+       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-600">
         <Link
          href="/"
          onClick={() => isMobile && setSidebarOpen(false)}>
@@ -157,7 +157,7 @@ export default function WebMasterSidebar({
            <div className="flex flex-col">
             <Link
              href={link.path}
-             className={`flex items-center gap-3 2xl:p-3 xl:p-2 rounded-lg hover:bg-teal-700/50 transition-all ${
+             className={`flex items-center gap-3 p-3 rounded-lg hover:bg-teal-700/50 transition-all ${
               isActive(link.path, link.path === "/admin/webmaster")
                ? "bg-teal-700 font-medium"
                : ""
@@ -188,7 +188,7 @@ export default function WebMasterSidebar({
               initial={{opacity: 0, height: 0}}
               animate={{opacity: 1, height: "auto"}}
               exit={{opacity: 0, height: 0}}
-              className="ml-8 pl-3 border-l-2 border-blue-600/30">
+              className="ml-8 pl-3 border-l-2 border-blue-400/30">
               {link.subItems.map((subItem) => (
                <li
                 key={subItem.path}
@@ -214,7 +214,7 @@ export default function WebMasterSidebar({
         </ul>
        </div>
 
-       {/* Footer with sign out button */}
+       {/* Fixed footer */}
        <div className="w-full pt-4 pb-2">
         <motion.button
          onClick={() => signOut()}

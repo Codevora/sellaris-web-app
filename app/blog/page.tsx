@@ -1,14 +1,19 @@
-// app/blog/page.tsx
 "use client";
 
 import {useState} from "react";
 import BlogCard from "@/components/BlogCard";
 import {usePublicBlog} from "@/hooks/usePublicBlog";
-import {MotionButton} from "@/components/AnimatedComponent";
-import {FaSearch, FaSpinner} from "react-icons/fa";
+import {
+ MotionButton,
+ FadeIn,
+ StaggerContainer,
+ MotionDiv,
+} from "@/components/AnimatedComponent";
+import {FaSearch, FaSpinner, FaArrowRight} from "react-icons/fa";
+
 
 const BlogPage = () => {
- const {blogs, categories, isLoading, error, fetchBlogs, hasMore} =
+ const {blogs, isLoading, error, fetchBlogs, hasMore} =
   usePublicBlog();
  const [searchTerm, setSearchTerm] = useState("");
  const [selectedCategory, setSelectedCategory] = useState("");
@@ -18,75 +23,54 @@ const BlogPage = () => {
   fetchBlogs(searchTerm, selectedCategory);
  };
 
- const handleCategoryFilter = (category: string) => {
-  setSelectedCategory(category);
-  fetchBlogs(searchTerm, category);
- };
-
  const handleLoadMore = () => {
   fetchBlogs(searchTerm, selectedCategory, true);
  };
 
  return (
-  <div className="min-h-screen bg-gray-50 pt-28 pb-12 px-4 sm:px-6 lg:px-8">
-   <div className="max-w-7xl mx-auto">
+  <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+   <div className="max-w-7xl mx-auto relative z-10">
     {/* Hero Section */}
-    <div className="text-center mb-16">
-     <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-      Our <span className="text-teal-500">Blog</span>
-     </h1>
-     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-      Discover the latest articles, news, and stories from our team
-     </p>
-    </div>
+    <StaggerContainer className="text-center mb-16">
+     <FadeIn>
+      <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4 leading-tight">
+       <span className="inline-block bg-clip-text bg-teal-500 text-transparent">
+        Blog Kami
+       </span>
+      </h1>
+     </FadeIn>
+     <FadeIn>
+      <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+       Temukan wawasan terbaru dan cerita inspiratif dari tim kami
+      </p>
+     </FadeIn>
+    </StaggerContainer>
 
     {/* Search and Filter */}
-    <div className="mb-12">
+    <div className="mb-16">
      <form
       onSubmit={handleSearch}
-      className="mb-8">
-      <div className="relative max-w-xl mx-auto">
+      className="mb-8 max-w-2xl mx-auto relative">
+      <div className="relative">
        <input
         type="text"
-        placeholder="Search articles..."
+        placeholder="Cari artikel..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+        className="w-full pl-14 pr-24 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white/80 backdrop-blur-sm shadow-sm"
        />
-       <FaSearch className="absolute left-4 top-4 text-gray-400" />
+       <FaSearch className="absolute left-5 top-5 text-gray-400" />
       </div>
      </form>
-
-     <div className="flex flex-wrap justify-center gap-3">
-      <button
-       onClick={() => handleCategoryFilter("")}
-       className={`px-4 py-2 rounded-full ${
-        selectedCategory === ""
-         ? "bg-teal-500 text-white"
-         : "bg-white text-gray-700 hover:bg-gray-100"
-       } transition-all shadow-sm`}>
-       All
-      </button>
-      {categories.map((category) => (
-       <button
-        key={category}
-        onClick={() => handleCategoryFilter(category)}
-        className={`px-4 py-2 rounded-full ${
-         selectedCategory === category
-          ? "bg-teal-500 text-white"
-          : "bg-white text-gray-700 hover:bg-gray-100"
-        } transition-all shadow-sm`}>
-        {category}
-       </button>
-      ))}
-     </div>
     </div>
 
     {/* Error Message */}
     {error && (
-     <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 text-center">
-      {error}
-     </div>
+     <FadeIn className="mb-8">
+      <div className="max-w-2xl mx-auto p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center shadow-sm">
+       {error}
+      </div>
+     </FadeIn>
     )}
 
     {/* Blog List */}
@@ -95,17 +79,30 @@ const BlogPage = () => {
       <FaSpinner className="animate-spin text-4xl text-teal-500" />
      </div>
     ) : blogs.length === 0 ? (
-     <div className="text-center py-12 text-gray-500">
-      No articles found. Please try a different search.
-     </div>
+     <FadeIn className="text-center py-12">
+      <div className="max-w-md mx-auto">
+       <div className="text-gray-400 mb-4 text-6xl">📭</div>
+       <h3 className="text-xl font-medium text-gray-700 mb-2">
+        Artikel tidak ditemukan
+       </h3>
+       <p className="text-gray-500">
+        Coba gunakan kata kunci lain atau hapus filter untuk melihat lebih
+        banyak artikel
+       </p>
+      </div>
+     </FadeIn>
     ) : (
      <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-       {blogs.map((blog) => (
-        <BlogCard
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+       {blogs.map((blog, index) => (
+        <MotionDiv
          key={blog.id}
-         blog={blog}
-        />
+         initial={{opacity: 0}}
+         animate={{opacity: 1}}
+         transition={{delay: index * 0.1}}
+         whileHover={{y: -5}}>
+         <BlogCard blog={blog} />
+        </MotionDiv>
        ))}
       </div>
 
@@ -116,15 +113,19 @@ const BlogPage = () => {
          disabled={isLoading}
          whileHover={{scale: 1.05}}
          whileTap={{scale: 0.95}}
-         className={`px-8 py-3 rounded-lg ${
-          isLoading ? "bg-teal-400" : "bg-teal-500 hover:bg-teal-600"
-         } text-white font-medium transition-all shadow-lg`}>
+         className={`px-8 py-4 rounded-xl ${
+          isLoading
+           ? "bg-teal-400"
+           : "bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+         } text-white font-medium transition-all shadow-lg hover:shadow-xl`}>
          {isLoading ? (
-          <span className="flex items-center gap-2">
-           <FaSpinner className="animate-spin" /> Loading...
+          <span className="flex items-center justify-center gap-2">
+           <FaSpinner className="animate-spin" /> Memuat...
           </span>
          ) : (
-          "Load More Articles"
+          <span className="flex items-center justify-center gap-2">
+           Muat Lebih Banyak <FaArrowRight />
+          </span>
          )}
         </MotionButton>
        </div>

@@ -175,10 +175,10 @@ const BlogForm = () => {
        required
        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all">
        <option value="">Select a category</option>
-       <option value="Business">Business</option>
+       <option value="Retail">Retail</option>
+       <option value="F&B">F&B</option>
+       <option value="Analytics">Analytics</option>
        <option value="Technology">Technology</option>
-       <option value="Marketing">Marketing</option>
-       <option value="Productivity">Productivity</option>
       </select>
      </div>
     </div>

@@ -1,4 +1,3 @@
-// app/admin/webmaster/blog/components/BlogList.tsx
 "use client";
 
 import {useState} from "react";
@@ -7,12 +6,11 @@ import {MotionButton, MotionDiv} from "@/components/AnimatedComponent";
 import {
  FaSearch,
  FaTrash,
- FaEdit,
  FaChevronDown,
  FaChevronUp,
  FaSpinner,
+ FaTimes,
 } from "react-icons/fa";
-import Link from "next/link";
 import Image from "next/image";
 
 const BlogList = () => {
@@ -21,13 +19,18 @@ const BlogList = () => {
  const [selectedCategory, setSelectedCategory] = useState("");
  const [expandedBlogId, setExpandedBlogId] = useState<string | null>(null);
  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+ const [showDeleteModal, setShowDeleteModal] = useState(false);
+ const [blogToDelete, setBlogToDelete] = useState<{
+  id: string;
+  title: string;
+ } | null>(null);
 
  const categories = [
   {value: "", label: "All Categories"},
-  {value: "Business", label: "Business"},
+  {value: "Retail", label: "Retail"},
+  {value: "F&B", label: "F&B"},
+  {value: "Analytics", label: "Analytics"},
   {value: "Technology", label: "Technology"},
-  {value: "Marketing", label: "Marketing"},
-  {value: "Productivity", label: "Productivity"},
  ];
 
  const handleSearch = (e: React.FormEvent) => {
@@ -49,14 +52,76 @@ const BlogList = () => {
   setExpandedBlogId(expandedBlogId === blogId ? null : blogId);
  };
 
- const handleDelete = async (blogId: string, imageUrl?: string) => {
-  setIsDeleting(blogId);
-  await deleteBlog(blogId, imageUrl);
+ const openDeleteModal = (blogId: string, title: string) => {
+  setBlogToDelete({id: blogId, title});
+  setShowDeleteModal(true);
+ };
+
+ const closeDeleteModal = () => {
+  setShowDeleteModal(false);
+  setBlogToDelete(null);
+ };
+
+ const confirmDelete = async () => {
+  if (!blogToDelete) return;
+
+  setIsDeleting(blogToDelete.id);
+  await deleteBlog(blogToDelete.id,);
   setIsDeleting(null);
+  closeDeleteModal();
  };
 
  return (
   <div className="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+   {/* Delete Confirmation Modal */}
+   {showDeleteModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div className="p-6">
+       <div className="flex justify-between items-start">
+        <h3 className="text-lg font-semibold text-gray-900">
+         Konfirmasi Hapus
+        </h3>
+        <button
+         onClick={closeDeleteModal}
+         className="text-gray-400 hover:text-gray-500">
+         <FaTimes />
+        </button>
+       </div>
+       <div className="mt-4">
+        <p className="text-gray-600">
+         Apakah Anda yakin ingin menghapus blog{" "}
+         <span className="font-semibold">"{blogToDelete?.title}"</span>?
+         Tindakan ini tidak dapat dibatalkan.
+        </p>
+       </div>
+       <div className="mt-6 flex justify-end space-x-3">
+        <button
+         type="button"
+         onClick={closeDeleteModal}
+         className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+         Batal
+        </button>
+        <button
+         type="button"
+         onClick={confirmDelete}
+         disabled={isDeleting === blogToDelete?.id}
+         className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-400">
+         {isDeleting === blogToDelete?.id ? (
+          <span className="flex items-center gap-2">
+           <FaSpinner className="animate-spin" /> Menghapus...
+          </span>
+         ) : (
+          "Ya, Hapus"
+         )}
+        </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   )}
+
+   {/* Main Content */}
    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <h2 className="text-2xl font-bold text-gray-800">Blog Posts</h2>
 
@@ -137,18 +202,10 @@ const BlogList = () => {
             </p>
            </div>
            <div className="flex gap-2">
-            <Link href={`/admin/webmaster/blog/edit/${blog.id}`}>
-             <MotionButton
-              whileHover={{scale: 1.05}}
-              whileTap={{scale: 0.95}}
-              className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-all">
-              <FaEdit />
-             </MotionButton>
-            </Link>
             <MotionButton
              whileHover={{scale: 1.05}}
              whileTap={{scale: 0.95}}
-             onClick={() => handleDelete(blog.id, blog.imageUrl)}
+             onClick={() => openDeleteModal(blog.id, blog.title,)}
              disabled={isDeleting === blog.id}
              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all">
              {isDeleting === blog.id ? (
